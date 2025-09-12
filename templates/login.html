@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAXELO - Login</title>
+</head>
+<body>
+    <h1>MAXELO REGISTER PORTAL</h1>
+    <p>Secure access to your management dashboard</p>
+
+    <h2>Sign In to Your Account</h2>
+    <p>Enter your credentials to continue</p>
+
+    <form action="{{ url_for('login') }}" method="POST">
+        <div>
+            <label>
+                <input type="radio" name="user_type" value="employee" checked>
+                Employee
+            </label>
+            <label>
+                <input type="radio" name="user_type" value="admin">
+                Admin
+            </label>
+        </div>
+
+        <div>
+            <label for="email">Email Address</label><br>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+        </div>
+
+        <div>
+            <label for="password">Password</label><br>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+
+        <div>
+            <label>
+                <input type="checkbox" name="remember">
+                Remember this device
+            </label>
+            <a href="">Forgot Password?</a>
+        </div>
+
+        <button type="submit">Sign In</button>
+    </form>
+
+    <p>
+        <a href="">Back to Homepage</a>
+    </p>
+</body>
+</html>

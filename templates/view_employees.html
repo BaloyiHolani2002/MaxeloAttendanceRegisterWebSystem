@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>View Employees</title>
+</head>
+<body>
+    <h2>Employee List</h2>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+        {% for category, message in messages %}
+          <li><strong>{{ category|capitalize }}:</strong> {{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% if employees %}
+        <table border ="1" cellpadding="5" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Surname</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Position</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emp in employees %}
+                    <tr>
+                        <td>{{ emp[0] }}</td>
+                        <td>{{ emp[1] }}</td>
+                        <td>{{ emp[2] }}</td>
+                        <td>{{ emp[3] }}</td>
+                        <td>{{ emp[4] }}</td>
+                        <td>{{ emp[5] }}</td>
+                        <td>{{ emp[6] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No employees found.</p>
+    {% endif %}
+
+    <br>
+    <a href="{{ url_for('add_employee') }}">Add Employee</a><br>
+    <a href="{{ url_for('index') }}">Back to Home</a>
+</body>
+</html>
