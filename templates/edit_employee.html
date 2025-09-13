@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Employee</title>
+</head>
+<body>
+    <h2>Edit Employee</h2>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+        {% for category, message in messages %}
+          <li><strong>{{ category|capitalize }}:</strong> {{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('edit_employee', employee_id=employee.id) }}" method="POST">
+        <label for="names">First Name:</label><br>
+        <input type="text" id="names" name="names" value="{{ employee.names }}" required><br><br>
+
+        <label for="surname">Surname:</label><br>
+        <input type="text" id="surname" name="surname" value="{{ employee.surname }}" required><br><br>
+
+        <label for="phoneNumber">Phone:</label><br>
+        <input type="text" id="phoneNumber" name="phoneNumber" value="{{ employee.phoneNumber }}"><br><br>
+
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" value="{{ employee.email }}" required><br><br>
+
+        <label for="role">Role:</label><br>
+        <select id="role" name="role" required>
+            <option value="employee" {% if employee.role == 'employee' %}selected{% endif %}>Employee</option>
+            <option value="admin" {% if employee.role == 'admin' %}selected{% endif %}>Admin</option>
+        </select><br><br>
+
+        <label for="position">Position:</label><br>
+        <input type="text" id="position" name="position" value="{{ employee.position }}"><br><br>
+
+        <button type="submit">Update Employee</button>
+    </form>
+
+    <br>
+    <a href="{{ url_for('view_employees') }}">Back to Employee List</a>
+</body>
+</html>
