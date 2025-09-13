@@ -1,61 +1,534 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>View Employees</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee List - Admin Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root {
+            --navy-blue: #0a2240;
+            --medium-blue: #1a4480;
+            --light-blue: #d4e4f7;
+            --accent-blue: #3a7bd5;
+            --dark-text: #333333;
+            --light-text: #ffffff;
+            --success: #28a745;
+            --error: #dc3545;
+            --warning: #ffc107;
+            --gray-bg: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--light-blue) 0%, #f5f7fa 100%);
+            color: var(--dark-text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--navy-blue);
+            color: var(--light-text);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .search-container {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-input {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+            min-width: 250px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--navy-blue);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--medium-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .flash-messages {
+            margin-bottom: 25px;
+        }
+        
+        .flash-message {
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .flash-success {
+            background-color: #d4edda;
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+        
+        .flash-error {
+            background-color: #f8d7da;
+            color: var(--error);
+            border-left: 4px solid var(--error);
+        }
+        
+        .employee-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .employee-table th {
+            background-color: var(--light-blue);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--navy-blue);
+            border-bottom: 2px solid var(--accent-blue);
+        }
+        
+        .employee-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .employee-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .action-cell {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .action-link.edit:hover {
+            background-color: #e9f7fe;
+            color: var(--medium-blue);
+        }
+        
+        .action-link.delete {
+            color: var(--error);
+        }
+        
+        .action-link.delete:hover {
+            background-color: #fde8e8;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        
+        .pagination-btn {
+            padding: 8px 15px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .pagination-btn.active {
+            background: var(--navy-blue);
+            color: white;
+            border-color: var(--navy-blue);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--navy-blue);
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .search-container {
+                width: 100%;
+            }
+            
+            .search-input {
+                flex: 1;
+                min-width: auto;
+            }
+            
+            .employee-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .action-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h2>Employee List</h2>
-
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-        {% for category, message in messages %}
-          <li><strong>{{ category|capitalize }}:</strong> {{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-
-    {% if employees %}
-        <table border="1" cellpadding="5" cellspacing="0">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>First Name</th>
-                    <th>Surname</th>
-                    <th>Role</th>
-                    <th>Email</th>
-                    <th>Position</th>
-                    <th></th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for emp in employees %}
-                    <tr>
-                        <td>{{ emp[0] }}</td>
-                        <td>{{ emp[1] }}</td>
-                        <td>{{ emp[2] }}</td>
-                        <td>{{ emp[4] }}</td> <!-- Phone -->
-                        <td>{{ emp[3] }}</td> <!-- Email -->
-                        <td>{{ emp[5] }}</td> <!-- Role -->
-                        <td>{{ emp[6] }}</td> <!-- Position -->
-                        <td>
-                            <a href="{{ url_for('edit_employee', employee_id=emp[0]) }}">Edit</a> |
-                            <a href="{{ url_for('delete_employee', employee_id=emp[0]) }}" onclick="return confirm('Are you sure you want to delete this employee?');">Delete</a>
-                        </td>
-                    </tr>
+    <div class="container">
+        <header>
+            <div class="header-title">
+                <i class="fas fa-users fa-2x"></i>
+                <h1>Employee Management System</h1>
+            </div>
+            <div class="header-actions">
+                <a href="{{ url_for('add_employee') }}" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Add Employee
+                </a>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </div>
+        </header>
+        
+        <div class="content">
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="flash-messages">
+                {% for category, message in messages %}
+                  <div class="flash-message flash-{{ category }}">
+                    <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+                    <strong>{{ category|capitalize }}:</strong> {{ message }}
+                  </div>
                 {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No employees found.</p>
-    {% endif %}
+                </div>
+              {% endif %}
+            {% endwith %}
 
-    <br>
-    <a href="{{ url_for('add_employee') }}">Add Employee</a><br>
-    <a href="{{ url_for('admin_dashboard') }}">Back to Admin Dashboard</a>
+            <div class="controls">
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search by name or surname...">
+                    <button id="searchBtn" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+                <div class="action-buttons">
+                    <button id="pdfBtn" class="btn btn-success">
+                        <i class="fas fa-file-pdf"></i> Export to PDF
+                    </button>
+                </div>
+            </div>
+
+            <h2>Employee List</h2>
+            
+            {% if employees %}
+                <table class="employee-table" id="employeeTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Surname</th>
+                            <th>Role</th>
+                            <th>Email</th>
+                            <th>Position</th>
+                            <th>Department</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeeTableBody">
+                        {% for emp in employees %}
+                            <tr>
+                                <td>{{ emp[0] }}</td>
+                                <td>{{ emp[1] }}</td>
+                                <td>{{ emp[2] }}</td>
+                                <td>{{ emp[4] }}</td>
+                                <td>{{ emp[3] }}</td>
+                                <td>{{ emp[5] }}</td>
+                                <td>{{ emp[6] }}</td>
+                                <td class="action-cell">
+                                    <a href="{{ url_for('edit_employee', employee_id=emp[0]) }}" class="action-link edit">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <a href="{{ url_for('delete_employee', employee_id=emp[0]) }}" class="action-link delete" onclick="return confirm('Are you sure you want to delete this employee?');">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-data">
+                    <i class="fas fa-users-slash fa-3x"></i>
+                    <p>No employees found in the database.</p>
+                </div>
+            {% endif %}
+
+            <div class="pagination">
+                <button class="pagination-btn active">1</button>
+                <button class="pagination-btn">2</button>
+                <button class="pagination-btn">3</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2023 Employee Management System | Admin Portal v2.0</p>
+    </footer>
+
+    <script>
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+        
+        // Function to load image as a promise
+        function loadImage(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = url;
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get elements
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+            const pdfBtn = document.getElementById('pdfBtn');
+            const tableBody = document.getElementById('employeeTableBody');
+            
+            // Search functionality
+            searchBtn.addEventListener('click', function() {
+                const searchText = searchInput.value.toLowerCase();
+                const rows = tableBody.getElementsByTagName('tr');
+                
+                for (let i = 0; i < rows.length; i++) {
+                    const firstName = rows[i].cells[1].textContent.toLowerCase();
+                    const surname = rows[i].cells[2].textContent.toLowerCase();
+                    
+                    if (firstName.includes(searchText) || surname.includes(searchText)) {
+                        rows[i].style.display = '';
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            });
+            
+            // Clear search when input is empty
+            searchInput.addEventListener('input', function() {
+                if (this.value.trim() === '') {
+                    const rows = tableBody.getElementsByTagName('tr');
+                    for (let i = 0; i < rows.length; i++) {
+                        rows[i].style.display = '';
+                    }
+                }
+            });
+            
+            // PDF export functionality
+            pdfBtn.addEventListener('click', async function() {
+                try {
+                    // Create new PDF document
+                    const doc = new jsPDF();
+                    
+                    // Load the logo image
+                    const img = new Image();
+            img.src = 'https://public-rf-upload.minhawebradio.net/244297/broadcaster/9ac83ceb07c3fe4b99f24d154dce3b26.jpg';
+            
+            img.onload = function() {
+                
+                // Add logo image
+                doc.addImage(img, 'JPEG', 14, 10, 40, 15);
+            }
+                    // Add logo to PDF
+                    
+                    // Add title
+                    doc.setFontSize(20);
+                    doc.setTextColor(40, 40, 40);
+                    doc.text('Maxelo Employee List', 60, 20);
+                    
+                    // Add date
+                    doc.setFontSize(12);
+                    doc.setTextColor(100, 100, 100);
+                    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 60, 27);
+                    
+                    // Extract table data from visible rows only
+                    const table = document.getElementById('employeeTable');
+                    const data = [];
+                    
+                    // Process header row
+                    const headerRow = table.rows[0];
+                    const headerData = [];
+                    
+                    for (let j = 0; j < headerRow.cells.length - 1; j++) { // Skip actions column
+                        headerData.push(headerRow.cells[j].textContent);
+                    }
+                    data.push(headerData);
+                    
+                    // Process data rows (only visible ones)
+                    for (let i = 1; i < table.rows.length; i++) {
+                        const row = table.rows[i];
+                        
+                        // Skip hidden rows (from search filtering)
+                        if (row.style.display === 'none') continue;
+                        
+                        const rowData = [];
+                        
+                        for (let j = 0; j < row.cells.length - 1; j++) { // Skip actions column
+                            rowData.push(row.cells[j].textContent);
+                        }
+                        
+                        data.push(rowData);
+                    }
+                    
+                    // Add table
+                    doc.autoTable({
+                        startY: 40,
+                        head: [data[0]], // Header row
+                        body: data.slice(1), // Data rows
+                        theme: 'grid',
+                        headStyles: {
+                            fillColor: [10, 34, 64], // Navy blue
+                            textColor: 255
+                        },
+                        alternateRowStyles: {
+                            fillColor: [212, 228, 247] // Light blue
+                        }
+                    });
+                    
+                    // Save the PDF
+                    doc.save('employee-list.pdf');
+                } catch (error) {
+                    console.error('Error generating PDF:', error);
+                    alert('Error generating PDF. Please try again.');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

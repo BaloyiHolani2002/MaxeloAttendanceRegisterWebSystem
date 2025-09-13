@@ -1,52 +1,417 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Add Employee</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Employee - MAXELO ATS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        :root {
+            --primary: #2c5282;
+            --primary-dark: #1a365d;
+            --primary-light: #4299e1;
+            --accent: #64ffda;
+            --success: #48bb78;
+            --warning: #ecc94b;
+            --danger: #e53e3e;
+            --dark: #2d3748;
+            --light: #f7fafc;
+            --gray: #a0aec0;
+            --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            color: var(--primary);
+            text-decoration: none;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            transform: translateX(-5px);
+            background: var(--primary);
+            color: white;
+        }
+        
+        .header-content h1 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .header-content p {
+            color: var(--gray);
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2.5rem;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .form-container:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+        
+        .form-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .form-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(44, 82, 130, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .form-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+        
+        /* Flash messages */
+        .flash-messages {
+            margin-bottom: 2rem;
+        }
+        
+        .flash-messages ul {
+            list-style: none;
+        }
+        
+        .flash-messages li {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background: #fff5f5;
+            color: #c53030;
+            border-left: 4px solid #c53030;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .flash-messages li:before {
+            content: '!';
+            font-weight: bold;
+            background: #c53030;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Form layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: var(--dark);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-group label i {
+            color: var(--primary);
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .input-with-icon input,
+        .input-with-icon select {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 45px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .input-with-icon input:focus,
+        .input-with-icon select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 82, 130, 0.1);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(44, 82, 130, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(44, 82, 130, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .btn-secondary:hover {
+            background: #f7fafc;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .back-btn {
+                align-self: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h2>Add New Employee</h2>
+    <div class="container">
+        <div class="header">
+            <a href="{{ url_for('admin_dashboard') }}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div class="header-content">
+                <h1>MAXELO ATS</h1>
+                <p>Employee Management System</p>
+            </div>
+        </div>
+        
+        <div class="form-container">
+            <div class="form-header">
+                <div class="form-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h2 class="form-title">Add New Employee</h2>
+            </div>
 
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-        {% for category, message in messages %}
-          <li><strong>{{ category|capitalize }}:</strong> {{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="flash-messages">
+                  <ul>
+                  {% for category, message in messages %}
+                    <li><strong>{{ category|capitalize }}:</strong> {{ message }}</li>
+                  {% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
+            {% endwith %}
 
-    <form method="POST" action="{{ url_for('add_employee') }}">
-        <label>First Name:</label><br>
-        <input type="text" name="names" required><br><br>
+            <form method="POST" action="{{ url_for('add_employee') }}">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="names"><i class="fas fa-user"></i> First Name</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="names" name="names" placeholder="Enter first name" required>
+                        </div>
+                    </div>
 
-        <label>Surname:</label><br>
-        <input type="text" name="surname" required><br><br>
+                    <div class="form-group">
+                        <label for="surname"><i class="fas fa-user"></i> Surname</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="surname" name="surname" placeholder="Enter surname" required>
+                        </div>
+                    </div>
 
-        <label>Phone Number:</label><br>
-        <input type="text" name="phoneNumber" required><br><br>
+                    <div class="form-group">
+                        <label for="phoneNumber"><i class="fas fa-phone"></i> Phone Number</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-phone"></i>
+                            <input type="text" id="phoneNumber" name="phoneNumber" placeholder="Enter phone number" required>
+                        </div>
+                    </div>
 
-        <label>Email:</label><br>
-        <input type="email" name="email" required><br><br>
+                    <div class="form-group">
+                        <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" name="email" placeholder="Enter email address" required>
+                        </div>
+                    </div>
 
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
+                    <div class="form-group">
+                        <label for="password"><i class="fas fa-lock"></i> Password</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" name="password" placeholder="Create a password" required>
+                        </div>
+                    </div>
 
-        <label>Role:</label><br>
-        <select name="role" required>
-            <option value="employee">Employee</option>
-            <option value="admin">Admin</option>
-        </select><br><br>
+                    <div class="form-group">
+                        <label for="role"><i class="fas fa-user-tag"></i> Role</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user-tag"></i>
+                            <select id="role" name="role" required>
+                                <option value="">Select a role</option>
+                                <option value="employee">Employee</option>
+                                <option value="admin">Admin</option>
+                                <option value="intern">Intern</option>
+                            </select>
+                        </div>
+                    </div>
 
-        <label>Position:</label><br>
-        <input type="text" name="position"><br><br>
+                    <div class="form-group full-width">
+                        <label for="position"><i class="fas fa-briefcase"></i> Position</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-briefcase"></i>
+                            <input type="text" id="position" name="position" placeholder="Enter job position">
+                        </div>
+                    </div>
+                </div>
 
-        <button type="submit">Add Employee</button>
-    </form>
+                <div class="form-actions">
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Add Employee
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <br>
-    <a href="{{ url_for('admin_dashboard') }}">Back to Admin Dashboard</a>
+    <script>
+        // Simple animation for form elements
+        document.addEventListener('DOMContentLoaded', function() {
+            const formGroups = document.querySelectorAll('.form-group');
+            
+            formGroups.forEach((group, index) => {
+                setTimeout(() => {
+                    group.style.opacity = 1;
+                    group.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+        });
+    </script>
 </body>
 </html>

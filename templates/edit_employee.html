@@ -1,49 +1,356 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Edit Employee</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Employee - Admin Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --navy-blue: #0a2240;
+            --medium-blue: #1a4480;
+            --light-blue: #d4e4f7;
+            --accent-blue: #3a7bd5;
+            --dark-text: #333333;
+            --light-text: #ffffff;
+            --success: #28a745;
+            --error: #dc3545;
+            --warning: #ffc107;
+            --gray-bg: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--light-blue) 0%, #f5f7fa 100%);
+            color: var(--dark-text);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--navy-blue);
+            color: var(--light-text);
+            padding: 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .flash-messages {
+            margin-bottom: 25px;
+        }
+        
+        .flash-message {
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .flash-success {
+            background-color: #d4edda;
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+        
+        .flash-error {
+            background-color: #f8d7da;
+            color: var(--error);
+            border-left: 4px solid var(--error);
+        }
+        
+        .flash-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border-left: 4px solid var(--warning);
+        }
+        
+        .form-title {
+            color: var(--navy-blue);
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .employee-info {
+            background-color: var(--light-blue);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .employee-avatar {
+            width: 60px;
+            height: 60px;
+            background-color: var(--medium-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .employee-details {
+            flex: 1;
+        }
+        
+        .employee-id {
+            font-size: 12px;
+            color: var(--medium-blue);
+            margin-top: 5px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--navy-blue);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.2);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 25px;
+            background: var(--medium-blue);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--navy-blue);
+        }
+        
+        .btn-primary:hover {
+            background: var(--medium-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-danger {
+            background: var(--error);
+        }
+        
+        .btn-danger:hover {
+            background: #bd2130;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--navy-blue);
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .action-buttons {
+                width: 100%;
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h2>Edit Employee</h2>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-users-cog"></i> Employee Management System</h1>
+            <p>Admin Portal - Edit Employee</p>
+        </header>
+        
+        <div class="content">
+            <!-- Flash messages -->
+            <div class="flash-messages">
+                <div class="flash-message flash-success">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>Success:</strong> Employee details have been updated successfully.
+                </div>
+                <div class="flash-message flash-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <strong>Error:</strong> Email address is already in use.
+                </div>
+            </div>
 
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-        {% for category, message in messages %}
-          <li><strong>{{ category|capitalize }}:</strong> {{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+            <h2 class="form-title"><i class="fas fa-user-edit"></i> Edit Employee</h2>
+            
+            <div class="employee-info">
+                <div class="employee-avatar">
+                    {{ employee.names[0] }}{{ employee.surname[0] }}
+                </div>
+                <div class="employee-details">
+                    <h3>{{ employee.names }} {{ employee.surname }}</h3>
+                    <div class="employee-id">Employee ID: {{ employee.id }}</div>
+                </div>
+            </div>
 
-    <form action="{{ url_for('edit_employee', employee_id=employee.id) }}" method="POST">
-        <label for="names">First Name:</label><br>
-        <input type="text" id="names" name="names" value="{{ employee.names }}" required><br><br>
+            <form action="{{ url_for('edit_employee', employee_id=employee.id) }}" method="POST">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="names">First Name:</label>
+                        <input type="text" id="names" name="names" value="{{ employee.names }}" required>
+                    </div>
 
-        <label for="surname">Surname:</label><br>
-        <input type="text" id="surname" name="surname" value="{{ employee.surname }}" required><br><br>
+                    <div class="form-group">
+                        <label for="surname">Surname:</label>
+                        <input type="text" id="surname" name="surname" value="{{ employee.surname }}" required>
+                    </div>
 
-        <label for="phoneNumber">Phone:</label><br>
-        <input type="text" id="phoneNumber" name="phoneNumber" value="{{ employee.phoneNumber }}"><br><br>
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number:</label>
+                        <input type="text" id="phoneNumber" name="phoneNumber" value="{{ employee.phoneNumber }}">
+                    </div>
 
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email" value="{{ employee.email }}" required><br><br>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" value="{{ employee.email }}" required>
+                    </div>
 
-        <label for="role">Role:</label><br>
-        <select id="role" name="role" required>
-            <option value="employee" {% if employee.role == 'employee' %}selected{% endif %}>Employee</option>
-            <option value="admin" {% if employee.role == 'admin' %}selected{% endif %}>Admin</option>
-        </select><br><br>
+                    <div class="form-group">
+                        <label for="role">Role:</label>
+                        <select id="role" name="role" required>
+                            <option value="employee" {% if employee.role == 'employee' %}selected{% endif %}>Employee</option>
+                            <option value="admin" {% if employee.role == 'admin' %}selected{% endif %}>Admin</option>
+                            <option value="intern" {% if employee.role == 'intern' %}selected{% endif %}>Intern</option>
+                        </select>
+                    </div>
 
-        <label for="position">Position:</label><br>
-        <input type="text" id="position" name="position" value="{{ employee.position }}"><br><br>
+                    <div class="form-group full-width">
+                        <label for="position">Position:</label>
+                        <input type="text" id="position" name="position" value="{{ employee.position }}">
+                    </div>
+                </div>
 
-        <button type="submit">Update Employee</button>
-    </form>
+                <div class="form-actions">
+                    <a href="{{ url_for('view_employees') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Employee List
+                    </a>
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Employee
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <br>
-    <a href="{{ url_for('view_employees') }}">Back to Employee List</a>
+    <footer>
+        <p>© 2023 Employee Management System | Admin Portal v2.0</p>
+    </footer>
 </body>
 </html>

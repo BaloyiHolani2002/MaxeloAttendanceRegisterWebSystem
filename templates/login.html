@@ -4,62 +4,349 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAXELO - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .login-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 480px;
+            overflow: hidden;
+            border: 1px solid #e1e8ed;
+            position: relative;
+        }
+        
+        .login-container:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #2c5282, #64ffda);
+        }
+        
+        .login-header {
+            padding: 2.5rem 2.5rem 1.5rem;
+            text-align: center;
+            background: #f7fafc;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .logo-icon {
+            font-size: 2.2rem;
+            color: #2c5282;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c5282;
+            letter-spacing: 1px;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            color: #2c5282;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: #4a5568;
+            margin-bottom: 1rem;
+        }
+        
+        .login-body {
+            padding: 2rem 2.5rem 2.5rem;
+        }
+        
+        .flash-messages {
+            margin-bottom: 1.5rem;
+        }
+        
+        .flash-messages ul {
+            list-style: none;
+        }
+        
+        .flash-messages li {
+            background: #fff5f5;
+            color: #c53030;
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid #c53030;
+        }
+        
+        .user-type-selector {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.8rem;
+            justify-content: center;
+        }
+        
+        .user-type-selector label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            background: #f7fafc;
+            transition: all 0.3s ease;
+        }
+        
+        .user-type-selector input[type="radio"] {
+            display: none;
+        }
+        
+        .user-type-selector span {
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .user-type-selector input[type="radio"]:checked + span {
+            color: #2c5282;
+            font-weight: 600;
+        }
+        
+        .user-type-selector input[type="radio"]:checked ~ span:before {
+            content: '';
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #2c5282;
+            margin-right: 5px;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+        }
+        
+        .input-with-icon input {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 45px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .input-with-icon input:focus {
+            outline: none;
+            border-color: #2c5282;
+            box-shadow: 0 0 0 3px rgba(44, 82, 130, 0.1);
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.8rem;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .remember-me input {
+            width: 18px;
+            height: 18px;
+            accent-color: #2c5282;
+        }
+        
+        .forgot-password {
+            color: #2c5282;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .forgot-password:hover {
+            color: #1a365d;
+            text-decoration: underline;
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(90deg, #2c5282 0%, #1a3a5f 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(44, 82, 130, 0.3);
+        }
+        
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(44, 82, 130, 0.4);
+        }
+        
+        .back-to-home {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .back-to-home a {
+            color: #4a5568;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+        }
+        
+        .back-to-home a:hover {
+            color: #2c5282;
+        }
+        
+        @media (max-width: 576px) {
+            .login-container {
+                max-width: 100%;
+            }
+            
+            .login-header, .login-body {
+                padding: 1.8rem;
+            }
+            
+            .user-type-selector {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            
+            .form-options {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>MAXELO REGISTER PORTAL</h1>
-    <p>Secure access to your management dashboard</p>
-
-    <h2>Sign In to Your Account</h2>
-    <p>Enter your credentials to continue</p>
-
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-          {% for category, message in messages %}
-            <li>
-              {{ message }}
-            </li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-
-    <form action="{{ url_for('login') }}" method="POST">
-        <div>
-            <label>
-                <input type="radio" name="user_type" value="employee" checked>
-                Employee
-            </label>
-            <label>
-                <input type="radio" name="user_type" value="admin"> 
-                Admin
-            </label>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo">
+                <i class="fas fa-user-clock logo-icon"></i>
+                <div class="logo-text">MAXELO ATS</div>
+            </div>
+            <h1>MAXELO REGISTER PORTAL</h1>
+            <p class="subtitle">Secure access to your management dashboard</p>
         </div>
+        
+        <div class="login-body">
+            <h2>Sign In to Your Account</h2>
+            <p class="subtitle">Enter your credentials to continue</p>
 
-        <div>
-            <label for="email">Email Address</label><br>
-            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="flash-messages">
+                  <ul>
+                    {% for category, message in messages %}
+                      <li>
+                        {{ message }}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('login') }}" method="POST">
+                <div class="user-type-selector">
+                    <label>
+                        <input type="radio" name="user_type" value="employee" checked>
+                        <span>Employee</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="user_type" value="admin"> 
+                        <span>Admin</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" name="remember">
+                        Remember this device
+                    </label>
+                    <a href="{{ url_for('reset_password') }}" class="forgot-password">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="login-button">Sign In</button>
+            </form>
+
+            <div class="back-to-home">
+                <a href="{{ url_for('index') }}"><i class="fas fa-arrow-left"></i> Back to Homepage</a>
+            </div>
         </div>
-
-        <div>
-            <label for="password">Password</label><br>
-            <input type="password" id="password" name="password" placeholder="Enter your password" required>
-        </div>
-
-        <div>
-            <label>
-                <input type="checkbox" name="remember">
-                Remember this device
-            </label>
-            <a href="{{ url_for('reset_password') }}">Forgot Password?</a>
-        </div>
-
-        <button type="submit">Sign In</button>
-    </form>
-
-    <p>
-        <a href="{{ url_for('index') }}">Back to Homepage</a>
-    </p>
+    </div>
 </body>
 </html>

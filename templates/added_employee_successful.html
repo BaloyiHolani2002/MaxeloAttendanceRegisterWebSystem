@@ -1,11 +1,211 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Employee Added</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Added Successfully</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --navy-blue: #0a2240;
+            --medium-blue: #1a4480;
+            --light-blue: #d4e4f7;
+            --accent-blue: #3a7bd5;
+            --success-green: #28a745;
+            --dark-text: #333333;
+            --light-text: #ffffff;
+            --gray-bg: #f8f9fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--light-blue) 0%, #f5f7fa 100%);
+            color: var(--dark-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .success-card {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .card-header {
+            background: var(--navy-blue);
+            color: var(--light-text);
+            padding: 30px 20px;
+        }
+        
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            color: var(--success-green);
+        }
+        
+        .card-body {
+            padding: 40px 30px;
+        }
+        
+        h2 {
+            color: var(--navy-blue);
+            margin-bottom: 15px;
+            font-size: 28px;
+        }
+        
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--navy-blue);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--medium-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-secondary {
+            background: var(--light-blue);
+            color: var(--navy-blue);
+            border: 1px solid var(--medium-blue);
+        }
+        
+        .btn-secondary:hover {
+            background: #e8f0fd;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-blue);
+            opacity: 0.7;
+            border-radius: 50%;
+            z-index: -1;
+            animation: confettiFall 5s linear infinite;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes confettiFall {
+            0% { 
+                transform: translateY(-100px) rotate(0deg); 
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(100vh) rotate(360deg); 
+                opacity: 0;
+            }
+        }
+        
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--navy-blue);
+            font-size: 14px;
+        }
+        
+        @media (max-width: 576px) {
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h2>Employee added successfully!</h2>
-    <a href="{{ url_for('add_employee') }}">Add Another Employee</a><br>
-    <a href="{{ url_for('admin_dashboard') }}">Back to Admin Dashboard</a>
+    <div class="success-card">
+        <div class="card-header">
+            <i class="fas fa-check-circle success-icon"></i>
+            <h1>Success!</h1>
+        </div>
+        
+        <div class="card-body">
+            <h2>Employee Added Successfully</h2>
+            <p>The new employee has been added to the system and can now access their account.</p>
+            
+            <div class="button-group">
+                <a href="{{ url_for('add_employee') }}" class="btn btn-primary">
+                    <i class="fas fa-user-plus"></i> Add Another Employee
+                </a>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 Employee Management System | Admin Portal</p>
+    </footer>
+
+    <script>
+        // Create confetti effect
+        document.addEventListener('DOMContentLoaded', function() {
+            const colors = ['#3a7bd5', '#0a2240', '#1a4480', '#28a745'];
+            const container = document.body;
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.animationDelay = Math.random() * 5 + 's';
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = confetti.style.width;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                container.appendChild(confetti);
+            }
+        });
+    </script>
 </body>
 </html>

@@ -1,62 +1,431 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Employee Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard - MAXELO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(90deg, #1a3a5f 0%, #2c5282 100%);
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #64ffda;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .user-info {
+            text-align: right;
+        }
+        
+        .user-info h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+        
+        .user-info p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            border: 1px solid #e1e8ed;
+        }
+        
+        .card h2 {
+            color: #2c5282;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .info-item {
+            margin-bottom: 1.2rem;
+        }
+        
+        .info-item label {
+            display: block;
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+        }
+        
+        .info-item p {
+            color: #2d3748;
+            font-size: 1.1rem;
+        }
+        
+        .attendance-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            border: 1px solid #e1e8ed;
+        }
+        
+        .attendance-status {
+            display: flex;
+            justify-content: space-around;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        
+        .status-item {
+            padding: 1.5rem;
+            border-radius: 10px;
+            background: #f7fafc;
+            width: 45%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .status-item h3 {
+            color: #4a5568;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+        
+        .status-item p {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c5282;
+        }
+        
+        .clock-in-time {
+            color: #38a169 !important;
+        }
+        
+        .clock-out-time {
+            color: #e53e3e !important;
+        }
+        
+        .attendance-type {
+            color: #d69e2e !important;
+        }
+        
+        .attendance-form {
+            margin-top: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .radio-option input {
+            width: 20px;
+            height: 20px;
+            accent-color: #2c5282;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #2c5282;
+            box-shadow: 0 0 0 3px rgba(44, 82, 130, 0.1);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(90deg, #2c5282 0%, #1a3a5f 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(44, 82, 130, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(44, 82, 130, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(90deg, #38a169 0%, #2f855a 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(90deg, #e53e3e 0%, #c53030 100%);
+        }
+        
+        .flash-messages {
+            margin-bottom: 2rem;
+        }
+        
+        .flash-messages ul {
+            list-style: none;
+        }
+        
+        .flash-messages li {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            background: #fff5f5;
+            color: #c53030;
+            border-left: 4px solid #c53030;
+        }
+        
+        .logout-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #2c5282;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 2rem;
+            transition: color 0.3s ease;
+        }
+        
+        .logout-link:hover {
+            color: #1a365d;
+        }
+        
+        @media (max-width: 900px) {
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .user-info {
+                text-align: center;
+            }
+            
+            .attendance-status {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+            }
+            
+            .status-item {
+                width: 100%;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>
-        Welcome, 
-        {% if user %}
-            {{ user.name }} {{ user.surname }}
-        {% else %}
-            Employee
-        {% endif %}
-    </h1>
+    <div class="dashboard-container">
+        <header>
+            <div class="logo-section">
+                <i class="fas fa-user-clock logo-icon"></i>
+                <div class="logo-text">MAXELO ATS</div>
+            </div>
+            <div class="user-info">
+                <h1>
+                    Welcome, 
+                    {% if user %}
+                        {{ user.name }} {{ user.surname }}
+                    {% else %}
+                        Employee
+                    {% endif %}
+                </h1>
+                <p>Date: {{ today or "N/A" }}</p>
+            </div>
+        </header>
 
-    <p><b>Email:</b> {{ user.email or "" }}</p>
-    <p><b>Phone:</b> {{ user.phoneNumber or "" }}</p>
-    <p><b>Role:</b> {{ user.role or "" }}</p>
-    <p><b>Position:</b> {{ user.position or "" }}</p>
-    <p>Date: {{ today or "N/A" }}</p>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-messages">
+              <ul>
+              {% for category, message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        {% endwith %}
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-        {% for category, message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+        <div class="dashboard-content">
+            <div class="card">
+                <h2>Personal Information</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Email</label>
+                        <p>{{ user.email or "" }}</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Phone</label>
+                        <p>{{ user.phoneNumber or "" }}</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Role</label>
+                        <p>{{ user.role or "" }}</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Position</label>
+                        <p>{{ user.position or "" }}</p>
+                    </div>
+                </div>
+            </div>
 
-    <h2>Attendance</h2>
-    <p>Clock In: {{ clock_in_time or "Not yet" }}</p>
-    <p>Clock Out: {{ clock_out_time or "Not yet" }}</p>
-    <p>Type: {{ attendance_type or "Not yet" }}</p>
+            <div class="attendance-card">
+                <h2>Attendance</h2>
+                
+                <div class="attendance-status">
+                    <div class="status-item">
+                        <h3>Clock In</h3>
+                        <p class="clock-in-time">{{ clock_in_time or "Not yet" }}</p>
+                    </div>
+                    <div class="status-item">
+                        <h3>Clock Out</h3>
+                        <p class="clock-out-time">{{ clock_out_time or "Not yet" }}</p>
+                    </div>
+                </div>
+                
+                <div class="status-item" style="width: 100%; margin: 0 auto;">
+                    <h3>Attendance Type</h3>
+                    <p class="attendance-type">{{ attendance_type or "Not yet" }}</p>
+                </div>
 
-    {% if not clock_in_time %}
-    <form action="{{ url_for('clock_in') }}" method="POST">
-        <label>
-            <input type="radio" name="attendanceType" value="Remote" required> Remote
-        </label>
-        <label>
-            <input type="radio" name="attendanceType" value="Office" required> Office
-        </label>
-        <br>
-        <textarea name="notes" placeholder="Notes (optional)"></textarea><br>
-        <button type="submit">Clock In</button>
-    </form>
+                {% if not clock_in_time %}
+                <div class="attendance-form">
+                    <form action="{{ url_for('clock_in') }}" method="POST">
+                        <div class="form-group">
+                            <label>Select Attendance Type</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="remote" name="attendanceType" value="Remote" required>
+                                    <label for="remote">Remote</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="office" name="attendanceType" value="Office" required>
+                                    <label for="office">Office</label>
+                                </div>
+                            </div>
+                        </div>
 
-    {% elif not clock_out_time %}
-    <form action="{{ url_for('clock_out') }}" method="POST">
-        <button type="submit">Clock Out</button>
-    </form>
+                        <div class="form-group">
+                            <label for="notes">Notes (optional)</label>
+                            <textarea id="notes" name="notes" placeholder="Add any notes here..."></textarea>
+                        </div>
 
-    {% else %}
-    <p>You have completed your attendance for today.</p>
-    {% endif %}
+                        <button type="submit" class="btn btn-success">Clock In</button>
+                    </form>
+                </div>
 
-    <p><a href="{{ url_for('logout') }}">Logout</a></p>
+                {% elif not clock_out_time %}
+                <div class="attendance-form">
+                    <form action="{{ url_for('clock_out') }}" method="POST">
+                        <button type="submit" class="btn btn-danger">Clock Out</button>
+                    </form>
+                </div>
+
+                {% else %}
+                <div style="text-align: center; padding: 2rem 0;">
+                    <p>You have completed your attendance for today.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="logout-link">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
 </body>
 </html>

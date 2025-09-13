@@ -54,6 +54,8 @@ def login():
                 return redirect(url_for('admin_dashboard'))
             elif user_type == "employee" and session['role'] == "employee":
                 return redirect(url_for('employee_dashboard'))
+            elif user_type == "employee" and session['role'] == "intern":
+                return redirect(url_for('employee_dashboard'))
             elif user_type == "employee" and session['role'] == "admin":
                 # Admin logging in as employee
                 return redirect(url_for('employee_dashboard'))

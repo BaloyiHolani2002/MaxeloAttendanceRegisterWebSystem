@@ -4,52 +4,332 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAXELO Attendance Tracking System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #1a3a5f 0%, #2c5282 100%);
+            padding: 1.2rem 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .logo-icon {
+            font-size: 2rem;
+            color: #fff;
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #64ffda;
+        }
+        
+        .hero {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 2rem;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .hero-content {
+            background: #fff;
+            border-radius: 12px;
+            padding: 3.5rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            border: 1px solid #e1e8ed;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #2c5282, #64ffda);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            color: #2c5282;
+            margin-bottom: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            color: #4a5568;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+        
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            color: #4a5568;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.8;
+        }
+        
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2.5rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .feature {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 1.5rem;
+            width: 220px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature i {
+            font-size: 2.5rem;
+            color: #2c5282;
+            margin-bottom: 1rem;
+        }
+        
+        .feature h3 {
+            color: #2d3748;
+            margin-bottom: 0.8rem;
+        }
+        
+        .login-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(90deg, #2c5282 0%, #1a3a5f 100%);
+            color: white;
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(44, 82, 130, 0.3);
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(44, 82, 130, 0.4);
+            background: linear-gradient(90deg, #1a3a5f 0%, #2c5282 100%);
+        }
+        
+        .login-btn i {
+            margin-right: 0.8rem;
+        }
+        
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #cbd5e0, transparent);
+            margin: 3rem 0;
+        }
+        
+        footer {
+            background: linear-gradient(90deg, #1a3a5f 0%, #2c5282 100%);
+            padding: 3.5rem 2rem 2rem;
+            margin-top: auto;
+            color: white;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+        }
+        
+        .footer-section {
+            padding: 1rem;
+        }
+        
+        .footer-section h3 {
+            color: #64ffda;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(100, 255, 218, 0.3);
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .footer-section i {
+            color: #64ffda;
+            margin-right: 0.8rem;
+            font-size: 1.2rem;
+            width: 20px;
+        }
+        
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: #64ffda;
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 4rem;
+            color: rgba(255, 255, 255, 0.7);
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .hero {
+                padding: 1rem;
+            }
+            
+            .hero-content {
+                padding: 2.5rem 1.5rem;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
     <header>
-        <div>
-            <h1>MAXELO ATS</h1>
+        <div class="logo">
+            <i class="fas fa-user-clock logo-icon"></i>
+            <div class="logo-text">MAXELO ATS</div>
         </div>
+        
     </header>
 
     <!-- Hero Section -->
-    <section>
-        <div>
-            <h2>MAXELO ATTENDANCE TRACKING SYSTEM</h2>
+    <section class="hero">
+        <div class="hero-content">
+            <h1>MAXELO ATTENDANCE TRACKING SYSTEM</h1>
+            <h2>Streamline Your Workforce Management</h2>
             <p>
-                The Maxelo Attendance Tracking 
-                System helps businesses efficiently 
-                manage employee attendance, whether 
-                working from home or in the office. 
-                Save time, reduce errors, and improve 
-                productivity.
+                The Maxelo Attendance Tracking System helps businesses efficiently manage employee attendance, whether working from home or in the office. Save time, reduce errors, and improve productivity.
             </p>
-            <div>
-                <a href="/login">Log in</a>
-            </div>
+          
+            
+            <a href="/login" class="login-btn"><i class="fas fa-sign-in-alt"></i> Log in</a>
         </div>
+        
+        <div class="divider"></div>
     </section>
 
     <!-- Footer -->
     <footer>
-        <div>
-            <h3>Contact Information</h3>
-            <ul>
-                <li>Email: mandlaxavi@gmail.com / info@maxelobs.co.za</li>
-                <li>Phone: +1 (15) 013-0303 / +27 72 097 9413</li>
-                <li>Address: Stand No. 1447, Malamulele B-Extention, Malamulele, 0982</li>
-            </ul>
-
-            <h3>Connect With Us</h3>
-            <ul>
-                <li><a href="https://www.facebook.com/Maxelobusinesssolutions/">Facebook</a></li>
-                <li><a href="https://twitter.com/Maxeloradio">Twitter</a></li>
-                <li><a href="https://www.tiktok.com/">TikTok</a></li>
-                <li><a href="https://wa.me/550720979413">WhatsApp</a></li>
-            </ul>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Contact Information</h3>
+                <ul>
+                    <li><i class="fas fa-envelope"></i> mandlaxavi@gmail.com / info@maxelobs.co.za</li>
+                    <li><i class="fas fa-phone"></i> +1 (15) 013-0303 / +27 72 097 9413</li>
+                    <li><i class="fas fa-map-marker-alt"></i> Stand No. 1447, Malamulele B-Extention, Malamulele, 0982</li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Connect With Us</h3>
+                <ul>
+                    <li><a href="https://www.facebook.com/Maxelobusinesssolutions/"><i class="fab fa-facebook"></i> Facebook</a></li>
+                    <li><a href="https://twitter.com/Maxeloradio"><i class="fab fa-twitter"></i> Twitter</a></li>
+                    <li><a href="https://www.tiktok.com/"><i class="fab fa-tiktok"></i> TikTok</a></li>
+                    <li><a href="https://wa.me/550720979413"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                </ul>
+            </div>
         </div>
-        <p>&copy; 2025 Maxelo Attendance Tracking System. All rights reserved.</p>
+        
+        <div class="copyright">
+            <p>&copy; 2025 Maxelo Attendance Tracking System. All rights reserved.</p>
+        </div>
     </footer>
 </body>
 </html>
