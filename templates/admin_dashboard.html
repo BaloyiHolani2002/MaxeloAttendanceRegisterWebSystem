@@ -410,16 +410,19 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo">
-            <i class="fas fa-user-clock logo-icon"></i>
+            <i class="">
+                <img src="https://public-rf-upload.minhawebradio.net/244297/logo/a36c3dd8af8b4fc23f47b23f60f46a8c.jpg" 
+                alt="Maxelo Logo" 
+                style="width:1cm; height:1cm; object-fit:cover;" />
+            </i>
             <div class="logo-text">MAXELO ATS</div>
         </div>
         
         <ul class="nav-links">
-            <li><a href="#" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
-            <li><a href="{{ url_for('view_employees') }}"><i class="fas fa-users"></i> <span>Employees</span></a></li>
-            <li><a href="#"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
-            <li><a href="#"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
-            <li><a href="#"><i class="fas fa-question-circle"></i> <span>Support</span></a></li>
+            <li><a href="{{ url_for('admin_dashboard') }}" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+            <li><a href="{{ url_for('view_employees') }}"><i class="fas fa-users"></i> <span>View Employees</span></a></li>
+            <li><a href="{{ url_for('add_employee') }}"><i class="fas fa-chart-bar"></i> <span>Add Employee</span></a></li>
+            <li><a href="{{ url_for('view_register') }}"><i class="fas fa-cog"></i> <span>View Register</span></a></li>
         </ul>
     </div>
 

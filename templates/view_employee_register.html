@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,21 +22,21 @@
             --dark: #343a40;
             --gray: #6c757d;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
             background-color: #f5f7fa;
             color: #333;
             line-height: 1.6;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -44,7 +45,7 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             padding: 20px;
         }
-        
+
         header {
             display: flex;
             justify-content: space-between;
@@ -53,12 +54,12 @@
             padding-bottom: 20px;
             border-bottom: 1px solid #e0e0e0;
         }
-        
+
         .logo-container {
             display: flex;
             align-items: center;
         }
-        
+
         .logo {
             width: 50px;
             height: 50px;
@@ -69,18 +70,18 @@
             justify-content: center;
             margin-right: 15px;
         }
-        
+
         .logo i {
             font-size: 24px;
             color: white;
         }
-        
+
         .logo-text {
             font-size: 24px;
             font-weight: 700;
             color: var(--secondary);
         }
-        
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -94,59 +95,59 @@
             border: none;
             cursor: pointer;
         }
-        
+
         .btn:hover {
             background: #2980b9;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        
+
         .btn i {
             margin-right: 8px;
         }
-        
+
         .btn-success {
             background: var(--success);
         }
-        
+
         .btn-success:hover {
             background: #218838;
         }
-        
+
         .btn-danger {
             background: var(--danger);
         }
-        
+
         .btn-danger:hover {
             background: #c82333;
         }
-        
+
         .summary {
             background: white;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
-        
+
         .summary h3 {
             margin-bottom: 20px;
             color: var(--secondary);
             display: flex;
             align-items: center;
         }
-        
+
         .summary h3 i {
             margin-right: 10px;
             color: var(--primary);
         }
-        
+
         .summary-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
         }
-        
+
         .stat-card {
             background: #f8f9fa;
             padding: 20px;
@@ -154,57 +155,59 @@
             text-align: center;
             border-left: 4px solid var(--primary);
         }
-        
+
         .stat-value {
             font-size: 32px;
             font-weight: 700;
             color: var(--secondary);
             margin-bottom: 5px;
         }
-        
+
         .stat-label {
             color: var(--gray);
             font-size: 14px;
         }
-        
+
         .controls {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
-        
+
         .control-group {
             background: white;
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
-        
+
         .control-group h3 {
             margin-bottom: 15px;
             color: var(--secondary);
             display: flex;
             align-items: center;
         }
-        
+
         .control-group h3 i {
             margin-right: 10px;
             color: var(--primary);
         }
-        
-        .date-picker, .search-input, .role-select {
+
+        .date-picker,
+        .search-input,
+        .role-select {
             width: 100%;
             padding: 12px 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 14px;
         }
-        
+
         .search-container {
             position: relative;
         }
-        
+
         .search-icon {
             position: absolute;
             left: 15px;
@@ -212,24 +215,24 @@
             transform: translateY(-50%);
             color: var(--gray);
         }
-        
+
         .search-input {
             padding-left: 40px;
         }
-        
+
         .table-container {
             overflow-x: auto;
             margin-bottom: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
-        
+
         .register-table {
             width: 100%;
             border-collapse: collapse;
             background: white;
         }
-        
+
         .register-table th {
             background: var(--secondary);
             color: white;
@@ -237,20 +240,20 @@
             padding: 15px;
             font-weight: 600;
         }
-        
+
         .register-table td {
             padding: 15px;
             border-bottom: 1px solid #eee;
         }
-        
+
         .register-table tr:last-child td {
             border-bottom: none;
         }
-        
+
         .register-table tr:hover {
             background: #f8f9fa;
         }
-        
+
         .status-badge {
             display: inline-block;
             padding: 5px 12px;
@@ -258,29 +261,29 @@
             font-size: 12px;
             font-weight: 600;
         }
-        
+
         .status-office {
             background: #e8f5e9;
             color: #2e7d32;
         }
-        
+
         .status-remote {
             background: #e3f2fd;
             color: #1565c0;
         }
-        
+
         .status-absent {
             background: #ffebee;
             color: #c62828;
         }
-        
+
         .no-results {
             text-align: center;
             color: var(--gray);
             font-style: italic;
             padding: 20px;
         }
-        
+
         .notification {
             position: fixed;
             bottom: 20px;
@@ -291,26 +294,26 @@
             border-radius: 5px;
             display: flex;
             align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.3s ease;
             z-index: 1000;
         }
-        
+
         .notification.show {
             transform: translateY(0);
             opacity: 1;
         }
-        
+
         .notification i {
             margin-right: 10px;
         }
-        
+
         .flash-messages {
             margin-bottom: 20px;
         }
-        
+
         .flash-message {
             padding: 10px 15px;
             margin-bottom: 10px;
@@ -318,22 +321,22 @@
             border-left: 4px solid var(--primary);
             background-color: #f8f9fa;
         }
-        
+
         .flash-error {
             background-color: #ffebee;
             border-left-color: var(--danger);
         }
-        
+
         .flash-success {
             background-color: #e8f5e9;
             border-left-color: var(--success);
         }
-        
+
         .flash-warning {
             background-color: #fff8e1;
             border-left-color: var(--warning);
         }
-        
+
         .back-link {
             display: inline-block;
             margin-top: 20px;
@@ -341,37 +344,41 @@
             text-decoration: none;
             font-weight: 600;
         }
-        
+
         .back-link:hover {
             text-decoration: underline;
         }
-        
+
         @media (max-width: 768px) {
             .summary-stats {
                 grid-template-columns: 1fr 1fr;
             }
-            
+
             .controls {
                 grid-template-columns: 1fr;
             }
-            
+
             header {
                 flex-direction: column;
                 text-align: center;
             }
-            
+
             .logo-container {
                 margin-bottom: 20px;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
             <div class="logo-container">
                 <div class="logo">
-                    <i class="fas fa-calendar-check"></i>
+                    <i class="">
+                        <img src="https://public-rf-upload.minhawebradio.net/244297/logo/a36c3dd8af8b4fc23f47b23f60f46a8c.jpg"
+                            alt="Maxelo Logo" style="width:2cm; height:2cm; object-fit:cover;" />
+                    </i>
                 </div>
                 <div class="logo-text">Employee Attendance Register</div>
             </div>
@@ -379,12 +386,12 @@
                 <i class="fas fa-tachometer-alt"></i> Dashboard
             </a>
         </header>
-        
+
         <!-- Flash messages -->
         <div class="flash-messages">
             <!-- Placeholder for flash messages -->
         </div>
-        
+
         <div class="controls">
             <div class="control-group">
                 <h3><i class="fas fa-calendar-alt"></i> Select Date</h3>
@@ -400,7 +407,7 @@
                     <option value="intern">Intern</option>
                 </select>
             </div>
-            
+
             <div class="control-group">
                 <h3><i class="fas fa-download"></i> Export Options</h3>
                 <button id="downloadBtn" class="btn btn-success">
@@ -411,26 +418,26 @@
                 </button>
             </div>
         </div>
-        
-       
-    <div class="container">
-        
-        
-        <!-- Flash messages -->
-        <div class="flash-messages">
-            {% with messages = get_flashed_messages(with_categories=true) %}
+
+
+        <div class="container">
+
+
+            <!-- Flash messages -->
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="flash-message flash-{{ category }}">
-                            <strong>{{ category|capitalize }}:</strong> {{ message }}
-                        </div>
-                    {% endfor %}
+                {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">
+                    <strong>{{ category|capitalize }}:</strong> {{ message }}
+                </div>
+                {% endfor %}
                 {% endif %}
-            {% endwith %}
-        </div>
-      
-        <div class="table-container">
-            {% if attendance_records %}
+                {% endwith %}
+            </div>
+
+            <div class="table-container">
+                {% if attendance_records %}
                 <table class="register-table">
                     <thead>
                         <tr>
@@ -446,45 +453,45 @@
                     </thead>
                     <tbody id="attendanceData">
                         {% for record in attendance_records %}
-                            <tr>
-                                <td>{{ record[0] }}</td>
-                                <td>{{ record[1] }}</td>
-                                <td>{{ record[2] }}</td>
-                                <td>{{ record[3] }}</td>
-                                <td>{{ record[4] or "Not yet" }}</td>
-                                <td>{{ record[5] or "Not yet" }}</td>
-                                <td>
-                                    {% if record[6] %}
-                                        {% set status = record[6].lower() %}
-                                        <span class="status-badge 
+                        <tr>
+                            <td>{{ record[0] }}</td>
+                            <td>{{ record[1] }}</td>
+                            <td>{{ record[2] }}</td>
+                            <td>{{ record[3] }}</td>
+                            <td>{{ record[4] or "Not yet" }}</td>
+                            <td>{{ record[5] or "Not yet" }}</td>
+                            <td>
+                                {% if record[6] %}
+                                {% set status = record[6].lower() %}
+                                <span class="status-badge 
                                             {% if 'office' in status or 'present' in status %}status-office
                                             {% elif 'remote' in status %}status-remote
                                             {% elif 'absent' in status %}status-absent
                                             {% endif %}">
-                                            {{ record[6] }}
-                                        </span>
-                                    {% else %}
-                                        N/A
-                                    {% endif %}
-                                </td>
-                                <td>{{ record[7] or "N/A" }}</td>
-                            </tr>
+                                    {{ record[6] }}
+                                </span>
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td>{{ record[7] or "N/A" }}</td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-            {% else %}
+                {% else %}
                 <p class="no-results">No attendance records found.</p>
-            {% endif %}
+                {% endif %}
+            </div>
+
+
         </div>
 
-       
-    </div>
+        <div id="notification" class="notification">
+            <i class="fas fa-check-circle"></i> <span id="notificationText">PDF downloaded successfully!</span>
+        </div>
 
-    <div id="notification" class="notification">
-        <i class="fas fa-check-circle"></i> <span id="notificationText">PDF downloaded successfully!</span>
-    </div>
 
-    
 
 
         <a href="{{ url_for('admin_dashboard') }}" class="back-link">
@@ -497,10 +504,10 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Initialize jsPDF
             const { jsPDF } = window.jspdf;
-            
+
             // Get DOM elements
             const datePicker = document.getElementById('datePicker');
             const roleFilter = document.getElementById('roleFilter');
@@ -509,28 +516,28 @@
             const attendanceData = document.getElementById('attendanceData');
             const notification = document.getElementById('notification');
             const notificationText = document.getElementById('notificationText');
-            
+
             // Set current date as default
             const today = new Date();
             const formattedDate = today.toISOString().split('T')[0];
             datePicker.value = formattedDate;
-            
+
             // Filter function
             function filterAttendance() {
                 const selectedDate = datePicker.value;
                 const selectedRole = roleFilter.value;
                 const rows = attendanceData.getElementsByTagName('tr');
-                
+
                 let visibleCount = 0;
-                
+
                 for (let i = 0; i < rows.length; i++) {
                     const row = rows[i];
                     const roleCell = row.cells[3];
                     const clockInCell = row.cells[4];
-                    
+
                     // Check if row matches filters
                     const roleMatch = !selectedRole || roleCell.textContent === selectedRole;
-                    
+
                     // Compare dates without time
                     let dateMatch = false;
                     if (clockInCell.textContent !== "Not yet") {
@@ -538,7 +545,7 @@
                         const clockInDateOnly = clockInDate.toISOString().split('T')[0];
                         dateMatch = clockInDateOnly === selectedDate;
                     }
-                    
+
                     // Show or hide row based on filters
                     if (roleMatch && dateMatch) {
                         row.style.display = '';
@@ -547,7 +554,7 @@
                         row.style.display = 'none';
                     }
                 }
-                
+
                 // Show message if no results
                 const noResults = document.querySelector('.no-results');
                 if (visibleCount === 0) {
@@ -561,47 +568,47 @@
                     noResults.remove();
                 }
             }
-            
+
             // Initial filter on page load
             filterAttendance();
-            
+
             // Event listeners for filters
             datePicker.addEventListener('change', filterAttendance);
             roleFilter.addEventListener('change', filterAttendance);
-            
+
             // Reset filters
-            resetFiltersBtn.addEventListener('click', function() {
+            resetFiltersBtn.addEventListener('click', function () {
                 datePicker.value = formattedDate;
                 roleFilter.value = '';
                 filterAttendance();
                 showNotification('Filters reset successfully!');
             });
-            
+
             // Download PDF function
-            downloadBtn.addEventListener('click', function() {
+            downloadBtn.addEventListener('click', function () {
                 // Create new PDF document
                 const doc = new jsPDF();
-                
+
                 // Add title
                 doc.setFontSize(18);
                 doc.text('Maxelo Employee Attendance Register', 14, 15);
-                
+
                 // Add filters info
                 doc.setFontSize(11);
                 doc.setTextColor(100);
                 doc.text(`Date: ${datePicker.value} | Role: ${roleFilter.value || 'All'}`, 14, 22);
-                
+
                 // Prepare table data
                 const tableRows = [];
                 const headers = ['ID', 'First Name', 'Surname', 'Role', 'Clock In', 'Clock Out', 'Attendance Type', 'Notes'];
-                
+
                 // Get visible rows only
                 const rows = attendanceData.getElementsByTagName('tr');
                 for (let i = 0; i < rows.length; i++) {
                     if (rows[i].style.display !== 'none') {
                         const row = rows[i];
                         const rowData = [];
-                        
+
                         for (let j = 0; j < row.cells.length; j++) {
                             // For attendance type, get the text without HTML tags
                             if (j === 6) {
@@ -610,38 +617,46 @@
                                 rowData.push(row.cells[j].textContent);
                             }
                         }
-                        
+
                         tableRows.push(rowData);
                     }
                 }
-                
+
                 // Add table to PDF
                 doc.autoTable({
                     head: [headers],
                     body: tableRows,
                     startY: 30,
                     theme: 'grid',
-                    styles: { fontSize: 9 },
-                    headStyles: { fillColor: [44, 62, 80] }
+                    styles: {
+                        fontSize: 9,
+                        cellPadding: 2,   // reduce padding inside cells
+                        minCellHeight: 10 // control row height
+                    },
+                    headStyles: {
+                        fillColor: [44, 62, 80],
+                        cellPadding: 3
+                    }
                 });
-                
+
                 // Save the PDF
                 doc.save(`attendance_${datePicker.value}_${roleFilter.value || 'all'}.pdf`);
-                
+
                 // Show notification
                 showNotification('PDF downloaded successfully!');
             });
-            
+
             // Show notification function
             function showNotification(message) {
                 notificationText.textContent = message;
                 notification.classList.add('show');
-                
-                setTimeout(function() {
+
+                setTimeout(function () {
                     notification.classList.remove('show');
                 }, 3000);
             }
         });
     </script>
 </body>
+
 </html>

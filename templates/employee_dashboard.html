@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,20 +13,20 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
             color: #333;
             line-height: 1.6;
             min-height: 100vh;
         }
-        
+
         .dashboard-container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
         }
-        
+
         header {
             display: flex;
             justify-content: space-between;
@@ -37,44 +38,44 @@
             color: white;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         .logo-section {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
-        
+
         .logo-icon {
             font-size: 2.5rem;
             color: #64ffda;
         }
-        
+
         .logo-text {
             font-size: 1.8rem;
             font-weight: 700;
             color: white;
         }
-        
+
         .user-info {
             text-align: right;
         }
-        
+
         .user-info h1 {
             font-size: 1.8rem;
             margin-bottom: 0.5rem;
             color: white;
         }
-        
+
         .user-info p {
             color: rgba(255, 255, 255, 0.9);
         }
-        
+
         .dashboard-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
         }
-        
+
         .card {
             background: white;
             border-radius: 12px;
@@ -83,36 +84,36 @@
             margin-bottom: 2rem;
             border: 1px solid #e1e8ed;
         }
-        
+
         .card h2 {
             color: #2c5282;
             margin-bottom: 1.5rem;
             padding-bottom: 0.8rem;
             border-bottom: 2px solid #e2e8f0;
         }
-        
+
         .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1.5rem;
         }
-        
+
         .info-item {
             margin-bottom: 1.2rem;
         }
-        
+
         .info-item label {
             display: block;
             color: #4a5568;
             font-weight: 500;
             margin-bottom: 0.4rem;
         }
-        
+
         .info-item p {
             color: #2d3748;
             font-size: 1.1rem;
         }
-        
+
         .attendance-card {
             background: white;
             border-radius: 12px;
@@ -121,14 +122,14 @@
             margin-bottom: 2rem;
             border: 1px solid #e1e8ed;
         }
-        
+
         .attendance-status {
             display: flex;
             justify-content: space-around;
             margin: 2rem 0;
             text-align: center;
         }
-        
+
         .status-item {
             padding: 1.5rem;
             border-radius: 10px;
@@ -136,64 +137,64 @@
             width: 45%;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
-        
+
         .status-item h3 {
             color: #4a5568;
             margin-bottom: 0.8rem;
             font-size: 1.1rem;
         }
-        
+
         .status-item p {
             font-size: 1.3rem;
             font-weight: 600;
             color: #2c5282;
         }
-        
+
         .clock-in-time {
             color: #38a169 !important;
         }
-        
+
         .clock-out-time {
             color: #e53e3e !important;
         }
-        
+
         .attendance-type {
             color: #d69e2e !important;
         }
-        
+
         .attendance-form {
             margin-top: 2rem;
         }
-        
+
         .form-group {
             margin-bottom: 1.5rem;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 0.8rem;
             color: #4a5568;
             font-weight: 500;
         }
-        
+
         .radio-group {
             display: flex;
             gap: 2rem;
             margin-bottom: 1.5rem;
         }
-        
+
         .radio-option {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-        
+
         .radio-option input {
             width: 20px;
             height: 20px;
             accent-color: #2c5282;
         }
-        
+
         textarea {
             width: 100%;
             padding: 1rem;
@@ -203,13 +204,13 @@
             resize: vertical;
             min-height: 100px;
         }
-        
+
         textarea:focus {
             outline: none;
             border-color: #2c5282;
             box-shadow: 0 0 0 3px rgba(44, 82, 130, 0.1);
         }
-        
+
         .btn {
             display: inline-block;
             padding: 1rem 2.5rem;
@@ -223,28 +224,28 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(44, 82, 130, 0.3);
         }
-        
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(44, 82, 130, 0.4);
         }
-        
+
         .btn-success {
             background: linear-gradient(90deg, #38a169 0%, #2f855a 100%);
         }
-        
+
         .btn-danger {
             background: linear-gradient(90deg, #e53e3e 0%, #c53030 100%);
         }
-        
+
         .flash-messages {
             margin-bottom: 2rem;
         }
-        
+
         .flash-messages ul {
             list-style: none;
         }
-        
+
         .flash-messages li {
             padding: 1rem;
             border-radius: 8px;
@@ -253,7 +254,7 @@
             color: #c53030;
             border-left: 4px solid #c53030;
         }
-        
+
         .logout-link {
             display: inline-flex;
             align-items: center;
@@ -264,42 +265,42 @@
             margin-top: 2rem;
             transition: color 0.3s ease;
         }
-        
+
         .logout-link:hover {
             color: #1a365d;
         }
-        
+
         @media (max-width: 900px) {
             .dashboard-content {
                 grid-template-columns: 1fr;
             }
-            
+
             .info-grid {
                 grid-template-columns: 1fr;
             }
         }
-        
+
         @media (max-width: 600px) {
             header {
                 flex-direction: column;
                 text-align: center;
                 gap: 1rem;
             }
-            
+
             .user-info {
                 text-align: center;
             }
-            
+
             .attendance-status {
                 flex-direction: column;
                 gap: 1rem;
                 align-items: center;
             }
-            
+
             .status-item {
                 width: 100%;
             }
-            
+
             .radio-group {
                 flex-direction: column;
                 gap: 1rem;
@@ -307,20 +308,24 @@
         }
     </style>
 </head>
+
 <body>
     <div class="dashboard-container">
         <header>
             <div class="logo-section">
-                <i class="fas fa-user-clock logo-icon"></i>
+                <i class="">
+                    <img src="https://public-rf-upload.minhawebradio.net/244297/logo/a36c3dd8af8b4fc23f47b23f60f46a8c.jpg"
+                        alt="Maxelo Logo" style="width:1cm; height:1cm; object-fit:cover;" />
+                </i>
                 <div class="logo-text">MAXELO ATS</div>
             </div>
             <div class="user-info">
                 <h1>
-                    Welcome, 
+                    Welcome,
                     {% if user %}
-                        {{ user.name }} {{ user.surname }}
+                    {{ user.name }} {{ user.surname }}
                     {% else %}
-                        Employee
+                    Employee
                     {% endif %}
                 </h1>
                 <p>Date: {{ today or "N/A" }}</p>
@@ -329,15 +334,15 @@
 
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div class="flash-messages">
-              <ul>
-              {% for category, message in messages %}
+        {% if messages %}
+        <div class="flash-messages">
+            <ul>
+                {% for category, message in messages %}
                 <li>{{ message }}</li>
-              {% endfor %}
-              </ul>
-            </div>
-          {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
         {% endwith %}
 
         <div class="dashboard-content">
@@ -365,7 +370,7 @@
 
             <div class="attendance-card">
                 <h2>Attendance</h2>
-                
+
                 <div class="attendance-status">
                     <div class="status-item">
                         <h3>Clock In</h3>
@@ -376,7 +381,7 @@
                         <p class="clock-out-time">{{ clock_out_time or "Not yet" }}</p>
                     </div>
                 </div>
-                
+
                 <div class="status-item" style="width: 100%; margin: 0 auto;">
                     <h3>Attendance Type</h3>
                     <p class="attendance-type">{{ attendance_type or "Not yet" }}</p>
@@ -428,4 +433,5 @@
         </a>
     </div>
 </body>
+
 </html>
