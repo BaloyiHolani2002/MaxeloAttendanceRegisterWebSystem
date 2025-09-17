@@ -7,6 +7,77 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 app.permanent_session_lifetime = timedelta(days=7)
 
+# --- Database initialization ---
+def init_db():
+    try:
+        # Connect to the default PostgreSQL database to create our database
+        default_conn = psycopg2.connect(
+            host="localhost",
+            database="postgres",
+            user="postgres",
+            password="Maxelo@2023"
+        )
+        default_conn.autocommit = True
+        default_cur = default_conn.cursor()
+        
+        # Check if database exists, create if it doesn't
+        default_cur.execute("SELECT 1 FROM pg_database WHERE datname = 'maxelo_attendance_db'")
+        exists = default_cur.fetchone()
+        if not exists:
+            default_cur.execute("CREATE DATABASE maxelo_attendance_db")
+            print("Database created successfully")
+        
+        default_cur.close()
+        default_conn.close()
+        
+        # Now connect to our database and create tables
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        # Create Employee Table
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS MaxeloClientTable (
+                id BIGSERIAL PRIMARY KEY,
+                names VARCHAR(100) NOT NULL,
+                surname VARCHAR(100) NOT NULL,
+                phoneNumber VARCHAR(20) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                email VARCHAR(100) UNIQUE NOT NULL,
+                role VARCHAR(50) NOT NULL,
+                position VARCHAR(50)
+            )
+        """)
+        
+        # Create AttendanceRegister Table
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS AttendanceRegister (
+                id BIGSERIAL PRIMARY KEY,
+                employee_id BIGINT NOT NULL,
+                clockIn TIMESTAMP,
+                clockOut TIMESTAMP,
+                notes TEXT,
+                CONSTRAINT fk_employee
+                    FOREIGN KEY (employee_id) REFERENCES MaxeloClientTable(id)
+                    ON DELETE CASCADE
+            )
+        """)
+        
+        # Check if admin user exists, create if not
+        cur.execute("SELECT * FROM MaxeloClientTable WHERE email = 'admin@maxelo.com'")
+        if not cur.fetchone():
+            cur.execute("""
+                INSERT INTO MaxeloClientTable (names, surname, phoneNumber, password, email, role, position)
+                VALUES ('System', 'Admin', '0820000000', 'admin123', 'admin@maxelo.com', 'Admin', 'Manager')
+            """)
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        print("Database tables initialized successfully")
+        
+    except Exception as e:
+        print(f"Error initializing database: {e}")
+
 # --- Database connection ---
 def get_db_connection():
     DATABASE_URL = os.getenv("DATABASE_URL")
@@ -14,6 +85,8 @@ def get_db_connection():
         DATABASE_URL = "postgresql://postgres:Maxelo%402023@localhost:5432/maxelo_attendance_db"
     return psycopg2.connect(DATABASE_URL)
 
+# Initialize the database when the app starts
+init_db()
 
 # --- Index page ---
 @app.route('/')
@@ -167,16 +240,34 @@ def add_employee():
         phone = request.form.get('phoneNumber', '').strip()
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '').strip()
-        role = request.form.get('role', 'employee').strip()
+        role = request.form.get('role', '').strip()
         position = request.form.get('position', '').strip()
 
         if not all([names, surname, email, password, role]):
             flash('Please fill in all required fields.', 'error')
-            return redirect(url_for('add_employee'))
+            return render_template('add_employee.html', 
+                                  names=names, surname=surname, phone=phone,
+                                  email=email, role=role, position=position)
 
         conn = get_db_connection()
         cur = conn.cursor()
         try:
+            # Check if email already exists
+            cur.execute("SELECT id FROM MaxeloClientTable WHERE email = %s", (email,))
+            if cur.fetchone():
+                flash('This email is already registered. Please use a different email.', 'error')
+                return render_template('add_employee.html', 
+                                      names=names, surname=surname, phone=phone,
+                                      email=email, role=role, position=position)
+            
+            # Check if phone number already exists
+            cur.execute("SELECT id FROM MaxeloClientTable WHERE phoneNumber = %s", (phone,))
+            if cur.fetchone():
+                flash('This phone number is already registered. Please use a different phone number.', 'error')
+                return render_template('add_employee.html', 
+                                      names=names, surname=surname, phone=phone,
+                                      email=email, role=role, position=position)
+            
             # Insert employee
             cur.execute(
                 """
@@ -189,10 +280,26 @@ def add_employee():
             conn.commit()
             flash('Employee added successfully!', 'success')
             return redirect(url_for('added_employee_successful'))
+            
+        except psycopg2.IntegrityError as e:
+            conn.rollback()
+            if 'email' in str(e).lower():
+                flash('This email is already registered. Please use a different email.', 'error')
+            elif 'phonenumber' in str(e).lower():
+                flash('This phone number is already registered. Please use a different phone number.', 'error')
+            else:
+                flash('Database integrity error occurred. Please check your input.', 'error')
+            return render_template('add_employee.html', 
+                                  names=names, surname=surname, phone=phone,
+                                  email=email, role=role, position=position)
+            
         except Exception as e:
             conn.rollback()
-            flash('Database error occurred. Please try again.', 'error')
+            flash(f'Database error occurred: {str(e)}. Please try again.', 'error')
             print(f"Database error: {e}")
+            return render_template('add_employee.html', 
+                                  names=names, surname=surname, phone=phone,
+                                  email=email, role=role, position=position)
         finally:
             cur.close()
             conn.close()
@@ -331,7 +438,8 @@ def view_employees():
 
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT id, names, surname, email, role, position FROM MaxeloClientTable ORDER BY id ASC")
+    # Added phoneNumber to the SELECT query
+    cur.execute("SELECT id, names, surname, email, phoneNumber, role, position FROM MaxeloClientTable ORDER BY id ASC")
     employees = cur.fetchall()
     cur.close()
     conn.close()

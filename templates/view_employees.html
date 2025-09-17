@@ -39,7 +39,7 @@
 
         .container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1400px; /* Increased to accommodate extra column */
             margin: 20px auto;
             background: white;
             border-radius: 10px;
@@ -257,6 +257,13 @@
             font-size: 14px;
         }
 
+        @media (max-width: 1024px) {
+            .employee-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
         @media (max-width: 768px) {
             .controls {
                 flex-direction: column;
@@ -270,11 +277,6 @@
             .search-input {
                 flex: 1;
                 min-width: auto;
-            }
-
-            .employee-table {
-                display: block;
-                overflow-x: auto;
             }
 
             .action-buttons {
@@ -339,7 +341,7 @@
 
             <div class="controls">
                 <div class="search-container">
-                    <input type="text" id="searchInput" class="search-input" placeholder="Search by name or surname...">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search employees...">
                     <button id="searchBtn" class="btn btn-primary">
                         <i class="fas fa-search"></i> Search
                     </button>
@@ -360,23 +362,23 @@
                         <th>ID</th>
                         <th>First Name</th>
                         <th>Surname</th>
-                        <th>Role</th>
                         <th>Email</th>
+                        <th>Phone Number</th> <!-- Added Phone Number column -->
+                        <th>Role</th>
                         <th>Position</th>
-                        <th>Department</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="employeeTableBody">
                     {% for emp in employees %}
                     <tr>
-                        <td>{{ emp[0] }}</td>
-                        <td>{{ emp[1] }}</td>
-                        <td>{{ emp[2] }}</td>
-                        <td>{{ emp[4] }}</td>
-                        <td>{{ emp[3] }}</td>
-                        <td>{{ emp[5] }}</td>
-                        <td>{{ emp[6] }}</td>
+                        <td>{{ emp[0] }}</td> <!-- ID -->
+                        <td>{{ emp[1] }}</td> <!-- First Name -->
+                        <td>{{ emp[2] }}</td> <!-- Surname -->
+                        <td>{{ emp[3] }}</td> <!-- Email -->
+                        <td>{{ emp[4] }}</td> <!-- Phone Number (new field) -->
+                        <td>{{ emp[5] }}</td> <!-- Role -->
+                        <td>{{ emp[6] }}</td> <!-- Position -->
                         <td class="action-cell">
                             <a href="{{ url_for('edit_employee', employee_id=emp[0]) }}" class="action-link edit">
                                 <i class="fas fa-edit"></i> Edit
@@ -410,134 +412,133 @@
     </footer>
 
     <script>
-        // Initialize jsPDF
-        const { jsPDF } = window.jspdf;
+    // Initialize jsPDF
+    const { jsPDF } = window.jspdf;
 
-        // Function to load image as a promise
-        function loadImage(url) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => resolve(img);
-                img.onerror = reject;
-                img.src = url;
-            });
-        }
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get elements
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const pdfBtn = document.getElementById('pdfBtn');
+        const tableBody = document.getElementById('employeeTableBody');
 
-        document.addEventListener('DOMContentLoaded', function () {
-            // Get elements
-            const searchInput = document.getElementById('searchInput');
-            const searchBtn = document.getElementById('searchBtn');
-            const pdfBtn = document.getElementById('pdfBtn');
-            const tableBody = document.getElementById('employeeTableBody');
+        // Search functionality
+        searchBtn.addEventListener('click', function () {
+            const searchText = searchInput.value.toLowerCase();
+            const rows = tableBody.getElementsByTagName('tr');
 
-            // Search functionality
-            searchBtn.addEventListener('click', function () {
-                const searchText = searchInput.value.toLowerCase();
-                const rows = tableBody.getElementsByTagName('tr');
+            for (let i = 0; i < rows.length; i++) {
+                const firstName = rows[i].cells[1].textContent.toLowerCase();
+                const surname = rows[i].cells[2].textContent.toLowerCase();
+                const email = rows[i].cells[3].textContent.toLowerCase();
+                const phone = rows[i].cells[4].textContent.toLowerCase();
+                const role = rows[i].cells[5].textContent.toLowerCase();
+                const position = rows[i].cells[6].textContent.toLowerCase();
 
-                for (let i = 0; i < rows.length; i++) {
-                    const firstName = rows[i].cells[1].textContent.toLowerCase();
-                    const surname = rows[i].cells[2].textContent.toLowerCase();
-
-                    if (firstName.includes(searchText) || surname.includes(searchText)) {
-                        rows[i].style.display = '';
-                    } else {
-                        rows[i].style.display = 'none';
-                    }
+                if (firstName.includes(searchText) || surname.includes(searchText) || 
+                    email.includes(searchText) || phone.includes(searchText) ||
+                    role.includes(searchText) || position.includes(searchText)) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
                 }
-            });
-
-            // Clear search when input is empty
-            searchInput.addEventListener('input', function () {
-                if (this.value.trim() === '') {
-                    const rows = tableBody.getElementsByTagName('tr');
-                    for (let i = 0; i < rows.length; i++) {
-                        rows[i].style.display = '';
-                    }
-                }
-            });
-
-            // PDF export functionality
-            pdfBtn.addEventListener('click', async function () {
-                try {
-                    // Create new PDF document
-                    const doc = new jsPDF();
-
-                    // Load the logo image
-                    const img = new Image();
-                    img.src = 'https://public-rf-upload.minhawebradio.net/244297/broadcaster/9ac83ceb07c3fe4b99f24d154dce3b26.jpg';
-
-                    img.onload = function () {
-
-                        // Add logo image
-                        doc.addImage(img, 'JPEG', 14, 10, 40, 15);
-                    }
-                    // Add logo to PDF
-
-                    // Add title
-                    doc.setFontSize(20);
-                    doc.setTextColor(40, 40, 40);
-                    doc.text('Maxelo Employee List', 60, 20);
-
-                    // Add date
-                    doc.setFontSize(12);
-                    doc.setTextColor(100, 100, 100);
-                    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 60, 27);
-
-                    // Extract table data from visible rows only
-                    const table = document.getElementById('employeeTable');
-                    const data = [];
-
-                    // Process header row
-                    const headerRow = table.rows[0];
-                    const headerData = [];
-
-                    for (let j = 0; j < headerRow.cells.length - 1; j++) { // Skip actions column
-                        headerData.push(headerRow.cells[j].textContent);
-                    }
-                    data.push(headerData);
-
-                    // Process data rows (only visible ones)
-                    for (let i = 1; i < table.rows.length; i++) {
-                        const row = table.rows[i];
-
-                        // Skip hidden rows (from search filtering)
-                        if (row.style.display === 'none') continue;
-
-                        const rowData = [];
-
-                        for (let j = 0; j < row.cells.length - 1; j++) { // Skip actions column
-                            rowData.push(row.cells[j].textContent);
-                        }
-
-                        data.push(rowData);
-                    }
-
-                    // Add table
-                    doc.autoTable({
-                        startY: 40,
-                        head: [data[0]], // Header row
-                        body: data.slice(1), // Data rows
-                        theme: 'grid',
-                        headStyles: {
-                            fillColor: [10, 34, 64], // Navy blue
-                            textColor: 255
-                        },
-                        alternateRowStyles: {
-                            fillColor: [212, 228, 247] // Light blue
-                        }
-                    });
-
-                    // Save the PDF
-                    doc.save('employee-list.pdf');
-                
-                } catch (error) {
-                    console.error('Error generating PDF:', error);
-                    alert('Error generating PDF. Please try again.');
-                }
-            });
+            }
         });
-    </script>
+
+        // Clear search when input is empty
+        searchInput.addEventListener('input', function () {
+            if (this.value.trim() === '') {
+                const rows = tableBody.getElementsByTagName('tr');
+                for (let i = 0; i < rows.length; i++) {
+                    rows[i].style.display = '';
+                }
+            }
+        });
+
+        // PDF export functionality
+        pdfBtn.addEventListener('click', function () {
+            try {
+                // Create new PDF document
+                const doc = new jsPDF();
+                
+                // Add title
+                doc.setFontSize(20);
+                doc.setTextColor(40, 40, 40);
+                doc.text('Maxelo Employee List', 105, 15, { align: 'center' });
+
+                // Add date
+                doc.setFontSize(12);
+                doc.setTextColor(100, 100, 100);
+                doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 22, { align: 'center' });
+
+                // Extract table data from visible rows only
+                const table = document.getElementById('employeeTable');
+                const data = [];
+
+                // Process header row
+                const headerRow = table.rows[0];
+                const headerData = [];
+
+                for (let j = 0; j < headerRow.cells.length - 1; j++) { // Skip actions column
+                    headerData.push(headerRow.cells[j].textContent);
+                }
+                data.push(headerData);
+
+                // Process data rows (only visible ones)
+                for (let i = 1; i < table.rows.length; i++) {
+                    const row = table.rows[i];
+
+                    // Skip hidden rows (from search filtering)
+                    if (row.style.display === 'none') continue;
+
+                    const rowData = [];
+
+                    for (let j = 0; j < row.cells.length - 1; j++) { // Skip actions column
+                        rowData.push(row.cells[j].textContent);
+                    }
+
+                    data.push(rowData);
+                }
+
+                // Add table
+                doc.autoTable({
+                    startY: 30,
+                    head: [data[0]], // Header row
+                    body: data.slice(1), // Data rows
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [10, 34, 64], // Navy blue
+                        textColor: 255,
+                        fontStyle: 'bold'
+                    },
+                    alternateRowStyles: {
+                        fillColor: [240, 240, 240]
+                    },
+                    styles: {
+                        fontSize: 9,
+                        cellPadding: 3,
+                        overflow: 'linebreak'
+                    },
+                    margin: { top: 30 }
+                });
+
+                // Save the PDF
+                doc.save('maxelo-employee-list.pdf');
+                
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('Error generating PDF. Please try again.');
+            }
+        });
+
+        // Add keyboard shortcut for search (Enter key)
+        searchInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchBtn.click();
+            }
+        });
+    });
+</script>
 </body>
 
 </html>

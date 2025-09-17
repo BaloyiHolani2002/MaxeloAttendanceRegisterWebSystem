@@ -448,7 +448,7 @@
                             <th>Clock In</th>
                             <th>Clock Out</th>
                             <th>Attendance Type</th>
-                            <th>Notes</th>
+                           
                         </tr>
                     </thead>
                     <tbody id="attendanceData">
@@ -474,7 +474,7 @@
                                 N/A
                                 {% endif %}
                             </td>
-                            <td>{{ record[7] or "N/A" }}</td>
+                            
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -599,45 +599,44 @@
                 doc.text(`Date: ${datePicker.value} | Role: ${roleFilter.value || 'All'}`, 14, 22);
 
                 // Prepare table data
-                const tableRows = [];
-                const headers = ['ID', 'First Name', 'Surname', 'Role', 'Clock In', 'Clock Out', 'Attendance Type', 'Notes'];
+            const tableRows = [];
+const headers = ['ID', 'First Name', 'Surname', 'Role', 'Clock In', 'Clock Out', 'Attendance Type'];
 
-                // Get visible rows only
-                const rows = attendanceData.getElementsByTagName('tr');
-                for (let i = 0; i < rows.length; i++) {
-                    if (rows[i].style.display !== 'none') {
-                        const row = rows[i];
-                        const rowData = [];
+// Collect visible rows
+const rows = attendanceData.getElementsByTagName('tr');
+for (let i = 0; i < rows.length; i++) {
+  if (rows[i].style.display !== 'none') {
+    const rowData = [];
+    for (let j = 0; j < rows[i].cells.length; j++) {
+      rowData.push(rows[i].cells[j].textContent.trim());
+    }
+    tableRows.push(rowData);
+  }
+}
 
-                        for (let j = 0; j < row.cells.length; j++) {
-                            // For attendance type, get the text without HTML tags
-                            if (j === 6) {
-                                rowData.push(row.cells[j].textContent);
-                            } else {
-                                rowData.push(row.cells[j].textContent);
-                            }
-                        }
+// Convert cm → pt
+const rowHeightPt = 0.3 * 28.35; // ≈ 22.7 pt
+const colWidthPt = 1.5 * 28.35;    // ≈ 56.7 pt
 
-                        tableRows.push(rowData);
-                    }
-                }
+doc.autoTable({
+  head: [headers],
+  body: tableRows,
+  startY: 30,
+  theme: 'grid',
+  styles: {
+    fontSize: 9,
+    cellPadding: 2,
+    minCellHeight: rowHeightPt
+  },
+  headStyles: {
+    fillColor: [44, 62, 80],
+    cellPadding: 3
+  },
+  columnStyles: {
+    6: { cellWidth: colWidthPt }  // Attendance Type
+  }
+});
 
-                // Add table to PDF
-                doc.autoTable({
-                    head: [headers],
-                    body: tableRows,
-                    startY: 30,
-                    theme: 'grid',
-                    styles: {
-                        fontSize: 9,
-                        cellPadding: 2,   // reduce padding inside cells
-                        minCellHeight: 10 // control row height
-                    },
-                    headStyles: {
-                        fillColor: [44, 62, 80],
-                        cellPadding: 3
-                    }
-                });
 
                 // Save the PDF
                 doc.save(`attendance_${datePicker.value}_${roleFilter.value || 'all'}.pdf`);
