@@ -215,7 +215,7 @@ def admin_dashboard():
     cur.execute("""
         SELECT COUNT(*) 
         FROM MaxeloClientTable 
-        WHERE role IN ('employee', 'inter', 'admin')
+        WHERE role IN ('employee', 'intern', 'admin')
     """)
     employee_count = cur.fetchone()[0]
 
@@ -227,7 +227,7 @@ def admin_dashboard():
         SELECT COUNT(*) 
         FROM attendanceregister a
         JOIN MaxeloClientTable e ON a.employee_id = e.id
-        WHERE DATE(a.clockin) = %s AND e.role IN ('employee', 'inter', 'admin')
+        WHERE DATE(a.clockin) = %s AND e.role IN ('employee', 'intern', 'admin')
     """, (today,))
     present_count = cur.fetchone()[0]
 
