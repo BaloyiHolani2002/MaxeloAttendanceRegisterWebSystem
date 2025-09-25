@@ -324,20 +324,6 @@
         </header>
 
         <div class="content">
-            <!-- Flash messages -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            <div class="flash-messages">
-                {% for category, message in messages %}
-                <div class="flash-message flash-{{ category }}">
-                    <i
-                        class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
-                    <strong>{{ category|capitalize }}:</strong> {{ message }}
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-            {% endwith %}
 
             <div class="controls">
                 <div class="search-container">

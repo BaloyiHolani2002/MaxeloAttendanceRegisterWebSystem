@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from datetime import datetime, timedelta, date
+import pytz
 import psycopg2
 import os
 
@@ -372,28 +373,31 @@ def employee_dashboard():
     )
 
 
-# --- Clock In ---
+#--- Clock In ---
 @app.route('/clock_in', methods=['POST'])
 def clock_in():
     if 'user_id' not in session:
         flash("Please log in first", "warning")
         return redirect(url_for('login'))
 
-    attendance_type = request.form.get("attendanceType")
     notes = request.form.get("notes")
+
+    sa_timezone = pytz.timezone("Africa/Johannesburg")
+    sa_time = datetime.now(sa_timezone)
 
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
         INSERT INTO AttendanceRegister (employee_id, clockIn, notes)
         VALUES (%s, %s, %s)
-    """, (session['user_id'], datetime.now(), attendance_type or notes))
+    """, (session['user_id'], sa_time, notes))
     conn.commit()
     cur.close()
     conn.close()
 
     flash("Clocked in successfully!", "success")
     return redirect(url_for('employee_dashboard'))
+
 
 # --- Clock Out ---
 @app.route('/clock_out', methods=['POST'])
@@ -402,10 +406,12 @@ def clock_out():
         flash("Please log in first", "warning")
         return redirect(url_for('login'))
 
+    sa_timezone = pytz.timezone("Africa/Johannesburg")
+    sa_time = datetime.now(sa_timezone)
+
     conn = get_db_connection()
     cur = conn.cursor()
 
-    # Get latest clocked-in record without clockOut
     cur.execute("""
         SELECT id FROM AttendanceRegister
         WHERE employee_id = %s AND clockOut IS NULL
@@ -415,11 +421,7 @@ def clock_out():
 
     if row:
         attendance_id = row[0]
-        cur.execute("""
-            UPDATE AttendanceRegister
-            SET clockOut = %s
-            WHERE id = %s
-        """, (datetime.now(), attendance_id))
+        cur.execute("UPDATE AttendanceRegister SET clockOut = %s WHERE id = %s", (sa_time, attendance_id))
         conn.commit()
         flash("Clocked out successfully!", "success")
     else:
@@ -428,6 +430,42 @@ def clock_out():
     cur.close()
     conn.close()
     return redirect(url_for('employee_dashboard'))
+    # Get South African time
+    sa_timezone = pytz.timezone("Africa/Johannesburg")
+    sa_time = datetime.now(sa_timezone)
+
+
+    # Format date and time separately (no seconds)
+    date_str = sa_time.strftime("%Y-%m-%d")
+    time_str = sa_time.strftime("%H:%M")
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+
+    # Get latest clocked-in record without clockOut
+    cur.execute("""
+        SELECT id FROM AttendanceRegister
+        WHERE employee_id = %s AND clockOutTime IS NULL
+        ORDER BY clockInDate DESC, clockInTime DESC LIMIT 1
+    """, (session['user_id'],))
+    row = cur.fetchone()
+
+    if row:
+        attendance_id = row[0]
+        cur.execute("""
+            UPDATE AttendanceRegister
+            SET clockOutDate = %s, clockOutTime = %s
+            WHERE id = %s
+        """, (date_str, time_str, attendance_id))
+        conn.commit()
+        flash("Clocked out successfully!", "success")
+    else:
+        flash("No active clock-in found for today.", "warning")
+
+    cur.close()
+    conn.close()
+    return redirect(url_for('employee_dashboard'))
+
 
 # --- View Employees ---
 @app.route('/view_employees')

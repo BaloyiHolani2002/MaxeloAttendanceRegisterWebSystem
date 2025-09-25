@@ -387,10 +387,7 @@
             </a>
         </header>
 
-        <!-- Flash messages -->
-        <div class="flash-messages">
-            <!-- Placeholder for flash messages -->
-        </div>
+
 
         <div class="controls">
             <div class="control-group">
@@ -422,39 +419,25 @@
 
         <div class="container">
 
-
-            <!-- Flash messages -->
-            <div class="flash-messages">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                {% for category, message in messages %}
-                <div class="flash-message flash-{{ category }}">
-                    <strong>{{ category|capitalize }}:</strong> {{ message }}
-                </div>
-                {% endfor %}
-                {% endif %}
-                {% endwith %}
-            </div>
-
             <div class="table-container">
                 {% if attendance_records %}
                 <table class="register-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>NO</th>
                             <th>First Name</th>
                             <th>Surname</th>
                             <th>Role</th>
                             <th>Clock In</th>
                             <th>Clock Out</th>
                             <th>Attendance Type</th>
-                           
+
                         </tr>
                     </thead>
                     <tbody id="attendanceData">
                         {% for record in attendance_records %}
                         <tr>
-                            <td>{{ record[0] }}</td>
+                            <td>{{ loop.index }}</td>
                             <td>{{ record[1] }}</td>
                             <td>{{ record[2] }}</td>
                             <td>{{ record[3] }}</td>
@@ -474,7 +457,7 @@
                                 N/A
                                 {% endif %}
                             </td>
-                            
+
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -502,13 +485,10 @@
     <div id="notification" class="notification">
         <i class="fas fa-check-circle"></i> <span id="notificationText">PDF downloaded successfully!</span>
     </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Initialize jsPDF
             const { jsPDF } = window.jspdf;
 
-            // Get DOM elements
             const datePicker = document.getElementById('datePicker');
             const roleFilter = document.getElementById('roleFilter');
             const downloadBtn = document.getElementById('downloadBtn');
@@ -517,37 +497,31 @@
             const notification = document.getElementById('notification');
             const notificationText = document.getElementById('notificationText');
 
-            // Set current date as default
+            // Default today’s date
             const today = new Date();
-            const formattedDate = today.toISOString().split('T')[0];
-            datePicker.value = formattedDate;
+            datePicker.value = today.toISOString().split('T')[0];
 
-            // Filter function
+            // Filtering
             function filterAttendance() {
                 const selectedDate = datePicker.value;
                 const selectedRole = roleFilter.value;
-                const rows = attendanceData.getElementsByTagName('tr');
-
+                const rows = attendanceData ? attendanceData.getElementsByTagName('tr') : [];
                 let visibleCount = 0;
 
-                for (let i = 0; i < rows.length; i++) {
-                    const row = rows[i];
+                for (let row of rows) {
                     const roleCell = row.cells[3];
                     const clockInCell = row.cells[4];
-
-                    // Check if row matches filters
                     const roleMatch = !selectedRole || roleCell.textContent === selectedRole;
 
-                    // Compare dates without time
                     let dateMatch = false;
-                    if (clockInCell.textContent !== "Not yet") {
-                        const clockInDate = new Date(clockInCell.textContent);
-                        const clockInDateOnly = clockInDate.toISOString().split('T')[0];
-                        dateMatch = clockInDateOnly === selectedDate;
+                    if (clockInCell.textContent && clockInCell.textContent !== "Not yet") {
+                        const cellDate = new Date(clockInCell.textContent);
+                        if (!isNaN(cellDate)) {
+                            dateMatch = cellDate.toISOString().split('T')[0] === selectedDate;
+                        }
                     }
 
-                    // Show or hide row based on filters
-                    if (roleMatch && dateMatch) {
+                    if (roleMatch && (!selectedDate || dateMatch)) {
                         row.style.display = '';
                         visibleCount++;
                     } else {
@@ -555,104 +529,64 @@
                     }
                 }
 
-                // Show message if no results
                 const noResults = document.querySelector('.no-results');
-                if (visibleCount === 0) {
-                    if (!noResults) {
-                        const noResultsMsg = document.createElement('p');
-                        noResultsMsg.className = 'no-results';
-                        noResultsMsg.textContent = 'No attendance records found for the selected filters.';
-                        document.querySelector('.table-container').appendChild(noResultsMsg);
-                    }
-                } else if (noResults) {
+                if (visibleCount === 0 && !noResults) {
+                    const msg = document.createElement('p');
+                    msg.className = 'no-results';
+                    msg.textContent = 'No attendance records found for the selected filters.';
+                    document.querySelector('.table-container').appendChild(msg);
+                } else if (visibleCount > 0 && noResults) {
                     noResults.remove();
                 }
             }
 
-            // Initial filter on page load
             filterAttendance();
-
-            // Event listeners for filters
             datePicker.addEventListener('change', filterAttendance);
             roleFilter.addEventListener('change', filterAttendance);
 
-            // Reset filters
             resetFiltersBtn.addEventListener('click', function () {
-                datePicker.value = formattedDate;
+                datePicker.value = today.toISOString().split('T')[0];
                 roleFilter.value = '';
                 filterAttendance();
                 showNotification('Filters reset successfully!');
             });
 
-            // Download PDF function
             downloadBtn.addEventListener('click', function () {
-                // Create new PDF document
                 const doc = new jsPDF();
-
-                // Add title
                 doc.setFontSize(18);
                 doc.text('Maxelo Employee Attendance Register', 14, 15);
 
-                // Add filters info
                 doc.setFontSize(11);
                 doc.setTextColor(100);
                 doc.text(`Date: ${datePicker.value} | Role: ${roleFilter.value || 'All'}`, 14, 22);
 
-                // Prepare table data
-            const tableRows = [];
-const headers = ['ID', 'First Name', 'Surname', 'Role', 'Clock In', 'Clock Out', 'Attendance Type'];
+                const headers = ['ID', 'First Name', 'Surname', 'Role', 'Clock In', 'Clock Out', 'Attendance Type'];
+                const tableRows = [];
+                const rows = attendanceData.getElementsByTagName('tr');
 
-// Collect visible rows
-const rows = attendanceData.getElementsByTagName('tr');
-for (let i = 0; i < rows.length; i++) {
-  if (rows[i].style.display !== 'none') {
-    const rowData = [];
-    for (let j = 0; j < rows[i].cells.length; j++) {
-      rowData.push(rows[i].cells[j].textContent.trim());
-    }
-    tableRows.push(rowData);
-  }
-}
+                for (let row of rows) {
+                    if (row.style.display !== 'none') {
+                        tableRows.push([...row.cells].map(cell => cell.textContent.trim()));
+                    }
+                }
 
-// Convert cm → pt
-const rowHeightPt = 0.3 * 28.35; // ≈ 22.7 pt
-const colWidthPt = 1.5 * 28.35;    // ≈ 56.7 pt
+                doc.autoTable({
+                    head: [headers],
+                    body: tableRows,
+                    startY: 30,
+                    theme: 'grid',
+                    styles: { fontSize: 9, cellPadding: 2 },
+                    headStyles: { fillColor: [44, 62, 80] }
+                });
 
-doc.autoTable({
-  head: [headers],
-  body: tableRows,
-  startY: 30,
-  theme: 'grid',
-  styles: {
-    fontSize: 9,
-    cellPadding: 2,
-    minCellHeight: rowHeightPt
-  },
-  headStyles: {
-    fillColor: [44, 62, 80],
-    cellPadding: 3
-  },
-  columnStyles: {
-    6: { cellWidth: colWidthPt }  // Attendance Type
-  }
-});
-
-
-                // Save the PDF
                 doc.save(`attendance_${datePicker.value}_${roleFilter.value || 'all'}.pdf`);
-
-                // Show notification
                 showNotification('PDF downloaded successfully!');
             });
 
-            // Show notification function
             function showNotification(message) {
                 notificationText.textContent = message;
                 notification.classList.add('show');
-
-                setTimeout(function () {
-                    notification.classList.remove('show');
-                }, 3000);
+                setTimeout(() => notification.classList.remove('show'), 3000);
             }
         });
     </script>
