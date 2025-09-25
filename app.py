@@ -385,12 +385,16 @@ def clock_in():
     sa_timezone = pytz.timezone("Africa/Johannesburg")
     sa_time = datetime.now(sa_timezone)
 
+    # Format date and time separately (no seconds)
+    date_str = sa_time.strftime("%Y-%m-%d %H:%M")
+
+
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
         INSERT INTO AttendanceRegister (employee_id, clockIn, notes)
         VALUES (%s, %s, %s)
-    """, (session['user_id'], sa_time, notes))
+    """, (session['user_id'], date_str, notes))
     conn.commit()
     cur.close()
     conn.close()
@@ -409,6 +413,10 @@ def clock_out():
     sa_timezone = pytz.timezone("Africa/Johannesburg")
     sa_time = datetime.now(sa_timezone)
 
+     # Format date and time separately (no seconds)
+    date_str = sa_time.strftime("%Y-%m-%d %H:%M")
+
+
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -421,7 +429,7 @@ def clock_out():
 
     if row:
         attendance_id = row[0]
-        cur.execute("UPDATE AttendanceRegister SET clockOut = %s WHERE id = %s", (sa_time, attendance_id))
+        cur.execute("UPDATE AttendanceRegister SET clockOut = %s WHERE id = %s", (date_str, attendance_id))
         conn.commit()
         flash("Clocked out successfully!", "success")
     else:
