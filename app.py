@@ -210,21 +210,42 @@ def admin_dashboard():
 
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) FROM MaxeloClientTable WHERE role='employee'")
+
+    # Total employees (employee, inter, admin)
+    cur.execute("""
+        SELECT COUNT(*) 
+        FROM MaxeloClientTable 
+        WHERE role IN ('employee', 'inter', 'admin')
+    """)
     employee_count = cur.fetchone()[0]
+
+    # Get today's date
+    today = datetime.now().date()
+
+    # Count present employees today
+    cur.execute("""
+        SELECT COUNT(*) 
+        FROM attendanceregister a
+        JOIN MaxeloClientTable e ON a.employee_id = e.id
+        WHERE DATE(a.clockin) = %s AND e.role IN ('employee', 'inter', 'admin')
+    """, (today,))
+    present_count = cur.fetchone()[0]
+
     cur.close()
     conn.close()
 
-    return render_template("admin_dashboard.html",
-                           employee_count=employee_count,
-                           present_today=0,
-                           absent_today=employee_count,
-                           current_user={
-                               "id": session['user_id'],
-                               "full_name": f"{session['user_name']} {session['user_surname']}",
-                               "email": session['email'],
-                               "last_login": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                           })
+    return render_template(
+        "admin_dashboard.html",
+        employee_count=employee_count,
+        present_today=present_count,
+        absent_today=employee_count - present_count,
+        current_user={
+            "id": session['user_id'],
+            "full_name": f"{session['user_name']} {session['user_surname']}",
+            "email": session['email'],
+            "last_login": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+    )
 
 # --- Add Employee ---
 @app.route('/add_employee', methods=['GET', 'POST'])
