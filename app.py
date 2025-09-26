@@ -401,7 +401,7 @@ def clock_in():
         flash("Please log in first", "warning")
         return redirect(url_for('login'))
 
-    notes = request.form.get("notes")
+    notes = request.form.get("notes") +'('+request.form.get("attendanceType") +')'
 
     sa_timezone = pytz.timezone("Africa/Johannesburg")
     sa_time = datetime.now(sa_timezone)
