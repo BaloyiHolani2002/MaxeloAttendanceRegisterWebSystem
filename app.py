@@ -341,59 +341,71 @@ def added_employee_successful():
     return render_template('added_employee_successful.html')
 
 # --- Employee Dashboard ---
-@app.route('/dashboard/employee')
+
+@app.route("/dashboard/employee")
 def employee_dashboard():
-    if 'user_id' not in session:
-        flash("Please log in first", "warning")
-        return redirect(url_for('login'))
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    user_id = session["user_id"]
 
     conn = get_db_connection()
     cur = conn.cursor()
 
-    # fetch user
-    cur.execute("SELECT id, names, surname, email, phoneNumber, role, position FROM MaxeloClientTable WHERE id = %s",
-                (session['user_id'],))
-    row = cur.fetchone()
-
-    if not row:
-        cur.close()
-        conn.close()
-        flash("User not found", "danger")
-        return redirect(url_for('login'))
-
-    user = {
-        "id": row[0],
-        "name": row[1],
-        "surname": row[2],
-        "email": row[3],
-        "phoneNumber": row[4],
-        "role": row[5],
-        "position": row[6]
-    }
-
-    # fetch today's attendance
-    today_str = date.today().strftime("%Y-%m-%d")
+    # Fetch user info
     cur.execute("""
-        SELECT clockIn, clockOut, notes
-        FROM AttendanceRegister
-        WHERE employee_id = %s AND DATE(clockIn) = %s
-        ORDER BY id DESC LIMIT 1
-    """, (user["id"], today_str))
-    attendance = cur.fetchone()
+        SELECT names, surname, email, phoneNumber, role, position
+        FROM maxeloclienttable
+        WHERE id=%s
+    """, (user_id,))
+    user = cur.fetchone()
 
-    cur.close()
+    # Fetch today's attendance
+    cur.execute("""
+        SELECT clockin, clockout, notes
+        FROM attendanceregister
+        WHERE employee_id=%s AND DATE(clockin) = CURRENT_DATE
+        ORDER BY clockin DESC LIMIT 1
+    """, (user_id,))
+    today_attendance = cur.fetchone()
+
+    # Fetch current month records
+    cur.execute("""
+        SELECT DATE(clockin) AS work_date,
+               clockin, clockout, notes
+        FROM attendanceregister
+        WHERE employee_id=%s 
+          AND DATE_TRUNC('month', clockin) = DATE_TRUNC('month', CURRENT_DATE)
+        ORDER BY clockin DESC
+    """, (user_id,))
+    attendance_records = cur.fetchall()
+
     conn.close()
 
     return render_template(
         "employee_dashboard.html",
-        user=user,
-        today=today_str,
-        clock_in_time=attendance[0] if attendance else None,
-        clock_out_time=attendance[1] if attendance else None,
-        attendance_type=attendance[2] if attendance else None
+        user={
+            "name": user[0],
+            "surname": user[1],
+            "email": user[2],
+            "phoneNumber": user[3],
+            "role": user[4],
+            "position": user[5],
+        },
+        today=date.today(),
+        clock_in_time=today_attendance[0] if today_attendance else None,
+        clock_out_time=today_attendance[1] if today_attendance else None,
+        attendance_type="Office" if today_attendance else None,  # optional, since your table doesn't store type separately
+        attendance_records=[
+            {
+                "date": rec[0],
+                "clock_in": rec[1],
+                "clock_out": rec[2],
+                "notes": rec[3]
+            } for rec in attendance_records
+        ],
+        month_name=date.today().strftime("%B")
     )
-
-
 #--- Clock In ---
 @app.route('/clock_in', methods=['POST'])
 def clock_in():
@@ -401,7 +413,7 @@ def clock_in():
         flash("Please log in first", "warning")
         return redirect(url_for('login'))
 
-    notes = request.form.get("notes") +'('+request.form.get("attendanceType") +')'
+    notes = request.form.get("notes") +' ('+request.form.get("attendanceType") +')'
 
     sa_timezone = pytz.timezone("Africa/Johannesburg")
     sa_time = datetime.now(sa_timezone)
