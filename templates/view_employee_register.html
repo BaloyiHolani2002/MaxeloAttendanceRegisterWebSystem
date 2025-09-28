@@ -142,32 +142,6 @@
             color: var(--primary);
         }
 
-        .summary-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .stat-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            border-left: 4px solid var(--primary);
-        }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--secondary);
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            color: var(--gray);
-            font-size: 14px;
-        }
-
         .controls {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -202,22 +176,6 @@
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 14px;
-        }
-
-        .search-container {
-            position: relative;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-        }
-
-        .search-input {
-            padding-left: 40px;
         }
 
         .table-container {
@@ -284,87 +242,9 @@
             padding: 20px;
         }
 
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--success);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .notification.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .notification i {
-            margin-right: 10px;
-        }
-
-        .flash-messages {
-            margin-bottom: 20px;
-        }
-
-        .flash-message {
-            padding: 10px 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            border-left: 4px solid var(--primary);
-            background-color: #f8f9fa;
-        }
-
-        .flash-error {
-            background-color: #ffebee;
-            border-left-color: var(--danger);
-        }
-
-        .flash-success {
-            background-color: #e8f5e9;
-            border-left-color: var(--success);
-        }
-
-        .flash-warning {
-            background-color: #fff8e1;
-            border-left-color: var(--warning);
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-
         @media (max-width: 768px) {
-            .summary-stats {
-                grid-template-columns: 1fr 1fr;
-            }
-
             .controls {
                 grid-template-columns: 1fr;
-            }
-
-            header {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .logo-container {
-                margin-bottom: 20px;
             }
         }
     </style>
@@ -386,8 +266,6 @@
                 <i class="fas fa-tachometer-alt"></i> Dashboard
             </a>
         </header>
-
-
 
         <div class="controls">
             <div class="control-group">
@@ -416,90 +294,78 @@
             </div>
         </div>
 
-
-        <div class="container">
-
-            <div class="table-container">
-                {% if attendance_records %}
-                <table class="register-table">
-                    <thead>
-                        <tr>
-                            <th>NO</th>
-                            <th>First Name</th>
-                            <th>Surname</th>
-                            <th>Role</th>
-                            <th>Clock In</th>
-                            <th>Clock Out</th>
-                            <th>Attendance Type</th>
-
-                        </tr>
-                    </thead>
-                    <tbody id="attendanceData">
-                        {% for record in attendance_records %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td>{{ record[1] }}</td>
-                            <td>{{ record[2] }}</td>
-                            <td>{{ record[3] }}</td>
-                            <td>{{ record[4] or "Not yet" }}</td>
-                            <td>{{ record[5] or "Not yet" }}</td>
-                            <td>
-                                {% if record[6] %}
-                                {% set status = record[6].lower() %}
-                                <span class="status-badge 
-                                            {% if 'office' in status or 'present' in status %}status-office
-                                            {% elif 'remote' in status %}status-remote
-                                            {% elif 'absent' in status %}status-absent
-                                            {% endif %}">
-                                    {{ record[6] }}
-                                </span>
-                                {% else %}
-                                N/A
-                                {% endif %}
-                            </td>
-
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                <p class="no-results">No attendance records found.</p>
-                {% endif %}
-            </div>
-
-
+        <div class="table-container">
+            {% if attendance_records %}
+            <table class="register-table">
+                <thead>
+                    <tr>
+                        <th>NO</th>
+                        <th>First Name</th>
+                        <th>Surname</th>
+                        <th>Role</th>
+                        <th>Clock In</th>
+                        <th>Clock Out</th>
+                        <th>Attendance Type</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceData">
+                    {% for record in attendance_records %}
+                    <tr>
+                        <td class="index-col"></td>
+                        <td>{{ record[1] }}</td>
+                        <td>{{ record[2] }}</td>
+                        <td>{{ record[3] }}</td>
+                        <td>{{ record[4] or "Not yet" }}</td>
+                        <td>{{ record[5] or "Not yet" }}</td>
+                        <td>
+                            {% if record[6] %}
+                            {% set status = record[6].lower() %}
+                            <span class="status-badge 
+                                        {% if 'office' in status or 'present' in status %}status-office
+                                        {% elif 'remote' in status %}status-remote
+                                        {% elif 'absent' in status %}status-absent
+                                        {% endif %}">
+                                {{ record[6] }}
+                            </span>
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="no-results">No attendance records found.</p>
+            {% endif %}
         </div>
 
-        <div id="notification" class="notification">
-            <i class="fas fa-check-circle"></i> <span id="notificationText">PDF downloaded successfully!</span>
-        </div>
-
-
-
-
-        <a href="{{ url_for('admin_dashboard') }}" class="back-link">
-            <i class="fas fa-arrow-left"></i> Back to Admin Dashboard
-        </a>
+        
     </div>
 
-    <div id="notification" class="notification">
-        <i class="fas fa-check-circle"></i> <span id="notificationText">PDF downloaded successfully!</span>
-    </div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const { jsPDF } = window.jspdf;
-
             const datePicker = document.getElementById('datePicker');
             const roleFilter = document.getElementById('roleFilter');
             const downloadBtn = document.getElementById('downloadBtn');
             const resetFiltersBtn = document.getElementById('resetFilters');
             const attendanceData = document.getElementById('attendanceData');
-            const notification = document.getElementById('notification');
-            const notificationText = document.getElementById('notificationText');
 
             // Default today’s date
             const today = new Date();
             datePicker.value = today.toISOString().split('T')[0];
+
+            // Renumber visible rows
+            function renumberRows() {
+                let rows = attendanceData.getElementsByTagName('tr');
+                let counter = 1;
+                for (let row of rows) {
+                    if (row.style.display !== 'none') {
+                        row.querySelector('.index-col').textContent = counter++;
+                    }
+                }
+            }
 
             // Filtering
             function filterAttendance() {
@@ -529,15 +395,7 @@
                     }
                 }
 
-                const noResults = document.querySelector('.no-results');
-                if (visibleCount === 0 && !noResults) {
-                    const msg = document.createElement('p');
-                    msg.className = 'no-results';
-                    msg.textContent = 'No attendance records found for the selected filters.';
-                    document.querySelector('.table-container').appendChild(msg);
-                } else if (visibleCount > 0 && noResults) {
-                    noResults.remove();
-                }
+                renumberRows();
             }
 
             filterAttendance();
@@ -548,9 +406,9 @@
                 datePicker.value = today.toISOString().split('T')[0];
                 roleFilter.value = '';
                 filterAttendance();
-                showNotification('Filters reset successfully!');
             });
 
+            // Download PDF
             downloadBtn.addEventListener('click', function () {
                 const doc = new jsPDF();
                 doc.setFontSize(18);
@@ -560,7 +418,7 @@
                 doc.setTextColor(100);
                 doc.text(`Date: ${datePicker.value} | Role: ${roleFilter.value || 'All'}`, 14, 22);
 
-                const headers = ['ID', 'First Name', 'Surname', 'Role', 'Clock In', 'Clock Out', 'Attendance Type'];
+                const headers = ['NO', 'First Name', 'Surname', 'Role', 'Clock In', 'Clock Out', 'Attendance Type'];
                 const tableRows = [];
                 const rows = attendanceData.getElementsByTagName('tr');
 
@@ -580,14 +438,7 @@
                 });
 
                 doc.save(`attendance_${datePicker.value}_${roleFilter.value || 'all'}.pdf`);
-                showNotification('PDF downloaded successfully!');
             });
-
-            function showNotification(message) {
-                notificationText.textContent = message;
-                notification.classList.add('show');
-                setTimeout(() => notification.classList.remove('show'), 3000);
-            }
         });
     </script>
 </body>
