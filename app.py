@@ -340,8 +340,8 @@ def added_employee_successful():
 
     return render_template('added_employee_successful.html')
 
-# --- Employee Dashboard ---
 
+# --- Employee Dashboard ---
 @app.route("/dashboard/employee")
 def employee_dashboard():
     if "user_id" not in session:
@@ -395,7 +395,7 @@ def employee_dashboard():
         today=date.today(),
         clock_in_time=today_attendance[0] if today_attendance else None,
         clock_out_time=today_attendance[1] if today_attendance else None,
-        attendance_type="Office" if today_attendance else None,  # optional, since your table doesn't store type separately
+        attendance_type=today_attendance[2] if today_attendance else None,  # ✅ FIXED
         attendance_records=[
             {
                 "date": rec[0],
@@ -406,6 +406,9 @@ def employee_dashboard():
         ],
         month_name=date.today().strftime("%B")
     )
+
+
+
 #--- Clock In ---
 @app.route('/clock_in', methods=['POST'])
 def clock_in():
@@ -413,7 +416,11 @@ def clock_in():
         flash("Please log in first", "warning")
         return redirect(url_for('login'))
 
-    notes = request.form.get("notes") +' ('+request.form.get("attendanceType") +')'
+    attendance_type = request.form.get("attendanceType") or ""
+    note_text = request.form.get("notes") or ""
+
+    # Save both in one column (attendance_type + notes)
+    combined_notes = f"({attendance_type}) {note_text}".strip()
 
     sa_timezone = pytz.timezone("Africa/Johannesburg")
     sa_time = datetime.now(sa_timezone)
@@ -421,20 +428,18 @@ def clock_in():
     # Format date and time separately (no seconds)
     date_str = sa_time.strftime("%Y-%m-%d %H:%M")
 
-
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
         INSERT INTO AttendanceRegister (employee_id, clockIn, notes)
         VALUES (%s, %s, %s)
-    """, (session['user_id'], date_str, notes))
+    """, (session['user_id'], date_str, combined_notes))
     conn.commit()
     cur.close()
     conn.close()
 
     flash("Clocked in successfully!", "success")
     return redirect(url_for('employee_dashboard'))
-
 
 # --- Clock Out ---
 @app.route('/clock_out', methods=['POST'])

@@ -283,7 +283,7 @@
             padding: 0.8rem 1.5rem;
             background: white;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             justify-content: center;
             width: 100%;
         }
@@ -301,8 +301,13 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .register-records.active {
@@ -323,7 +328,7 @@
             min-width: 500px;
         }
 
-        .records-table th, 
+        .records-table th,
         .records-table td {
             padding: 0.8rem;
             text-align: left;
@@ -386,55 +391,55 @@
             .dashboard-container {
                 padding: 2rem;
             }
-            
+
             header {
                 padding: 1.5rem 2rem;
                 margin-bottom: 2rem;
             }
-            
+
             .logo-text {
                 font-size: 1.8rem;
             }
-            
+
             .user-info h1 {
                 font-size: 1.8rem;
             }
-            
+
             .dashboard-content {
                 grid-template-columns: 1fr 1fr;
                 gap: 2rem;
             }
-            
+
             .card {
                 padding: 2rem;
                 margin-bottom: 2rem;
             }
-            
+
             .info-grid {
                 grid-template-columns: 1fr 1fr;
                 gap: 1.5rem;
             }
-            
+
             .attendance-status {
                 flex-direction: row;
                 justify-content: space-around;
                 margin: 2rem 0;
             }
-            
+
             .status-item {
                 width: 45%;
             }
-            
+
             .radio-group {
                 flex-direction: row;
                 gap: 2rem;
             }
-            
+
             .btn {
                 width: auto;
                 margin-bottom: 0;
             }
-            
+
             .logout-link {
                 width: auto;
                 margin-top: 2rem;
@@ -443,19 +448,24 @@
 
         /* iOS Safari specific fixes */
         @supports (-webkit-touch-callout: none) {
-            textarea, input {
-                font-size: 16px; /* Prevent zoom on focus in iOS */
+
+            textarea,
+            input {
+                font-size: 16px;
+                /* Prevent zoom on focus in iOS */
             }
-            
+
             .btn {
-                -webkit-appearance: none; /* Remove default iOS styling */
+                -webkit-appearance: none;
+                /* Remove default iOS styling */
             }
         }
 
         /* Android Chrome specific fixes */
         @media screen and (-webkit-min-device-pixel-ratio:0) {
             .btn {
-                -webkit-appearance: none; /* Remove default Android styling */
+                -webkit-appearance: none;
+                /* Remove default Android styling */
             }
         }
 
@@ -548,9 +558,9 @@
                         <h3>Clock In</h3>
                         <p class="clock-in-time">
                             {% if clock_in_time %}
-                                {{ clock_in_time }}
+                            {{ clock_in_time }}
                             {% else %}
-                                Not yet
+                            Not yet
                             {% endif %}
                         </p>
                     </div>
@@ -558,24 +568,26 @@
                         <h3>Clock Out</h3>
                         <p class="clock-out-time">
                             {% if clock_out_time %}
-                                {{ clock_out_time }}
+                            {{ clock_out_time }}
                             {% else %}
-                                Not yet
+                            Not yet
                             {% endif %}
                         </p>
                     </div>
                 </div>
-
                 <div class="status-item">
                     <h3>Attendance Type</h3>
                     <p class="attendance-type">
                         {% if attendance_type %}
-                            {{ attendance_type }}
+                        {{ attendance_type }}
                         {% else %}
-                            Not yet
+                        Not yet
                         {% endif %}
                     </p>
                 </div>
+
+
+
 
                 <div class="action-buttons">
                     {% if not clock_in_time %}
@@ -597,7 +609,8 @@
 
                             <div class="form-group">
                                 <label for="notes">Notes (optional)</label>
-                                <textarea id="notes" name="notes" placeholder="Your can give the reason when you are late..."></textarea>
+                                <textarea id="notes" name="notes"
+                                    placeholder="Your can give the reason when you are late..."></textarea>
                             </div>
 
                             <button type="submit" class="btn btn-success">
@@ -630,7 +643,7 @@
 
                 <!-- Register Records Section -->
                 <div id="registerRecords" class="register-records">
-                    <h3><i class="fas fa-history"></i> Attendance History (Last 30 Days)</h3>
+                    <h3><i class="fas fa-history"></i> Attendance History (Monthly)</h3>
                     {% if attendance_records and attendance_records|length > 0 %}
                     <div class="records-table-container">
                         <table class="records-table">
@@ -645,7 +658,7 @@
                             </thead>
                             <tbody>
                                 {% for record in attendance_records %}
-                                <tr {% if record.date == today %}class="today-highlight"{% endif %}>
+                                <tr {% if record.date==today %}class="today-highlight" {% endif %}>
                                     <td>{{ record.date or "N/A" }}</td>
                                     <td>{{ record.clock_in or "N/A" }}</td>
                                     <td>{{ record.clock_out or "N/A" }}</td>
@@ -680,10 +693,10 @@
 
     <script>
         // Toggle register records visibility
-        document.getElementById('viewRecordsBtn').addEventListener('click', function() {
+        document.getElementById('viewRecordsBtn').addEventListener('click', function () {
             const recordsSection = document.getElementById('registerRecords');
             const isVisible = recordsSection.classList.contains('active');
-            
+
             if (isVisible) {
                 recordsSection.classList.remove('active');
                 this.innerHTML = '<i class="fas fa-eye"></i> View Attendance History';
@@ -694,16 +707,16 @@
         });
 
         // Prevent zoom on input focus in iOS
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
                 const inputs = document.querySelectorAll('input, textarea, select');
                 inputs.forEach(input => {
-                    input.addEventListener('focus', function() {
+                    input.addEventListener('focus', function () {
                         document.body.style.zoom = '100%';
                     });
                 });
             }
-            
+
             // Add today's date highlighting
             const today = new Date().toISOString().split('T')[0];
             const dateCells = document.querySelectorAll('.records-table td:first-child');
