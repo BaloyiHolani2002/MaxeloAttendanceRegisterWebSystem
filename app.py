@@ -83,7 +83,7 @@ def init_db():
 def get_db_connection():
     DATABASE_URL = os.getenv("DATABASE_URL")
     if not DATABASE_URL:
-        DATABASE_URL = "postgresql://postgres:Maxelo%402023@localhost:5432/maxelo_attendance_db"
+        DATABASE_URL = "postgresql://postgres:Maxelov%402023@localhost:5432/maxelo_attendance_db"
     return psycopg2.connect(DATABASE_URL)
 
 # Initialize the database when the app starts
