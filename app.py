@@ -8,92 +8,74 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 app.permanent_session_lifetime = timedelta(days=7)
 
+# --- Database connection ---
+def get_db_connection():
+    DATABASE_URL = os.getenv("DATABASE_URL")
+
+    if DATABASE_URL:
+        # Running on Render or remote
+        if "sslmode" not in DATABASE_URL:
+            DATABASE_URL += "?sslmode=require"
+    else:
+        # Local development
+        DATABASE_URL = "postgresql://postgres:Maxelov%402023@localhost:5432/maxelo_attendance_db"
+
+    return psycopg2.connect(DATABASE_URL)
+
 # --- Database initialization ---
 def init_db():
     try:
-        # Connect to the default PostgreSQL database to create our database
-        default_conn = psycopg2.connect(
-            host="localhost",
-            database="postgres",
-            user="postgres",
-            password="Maxelo@2023"
-        )
-        default_conn.autocommit = True
-        default_cur = default_conn.cursor()
-        
-        # Check if database exists, create if it doesn't
-        default_cur.execute("SELECT 1 FROM pg_database WHERE datname = 'maxelo_attendance_db'")
-        exists = default_cur.fetchone()
-        if not exists:
-            default_cur.execute("CREATE DATABASE maxelo_attendance_db")
-            print("Database created successfully")
-        
-        default_cur.close()
-        default_conn.close()
-        
-        # Now connect to our database and create tables
         conn = get_db_connection()
         cur = conn.cursor()
-        
-        # Create Employee Table
+
+        # Create MaxeloClientTable
         cur.execute("""
-            CREATE TABLE IF NOT EXISTS MaxeloClientTable (
+            CREATE TABLE IF NOT EXISTS maxeloclienttable (
                 id BIGSERIAL PRIMARY KEY,
                 names VARCHAR(100) NOT NULL,
                 surname VARCHAR(100) NOT NULL,
-                phoneNumber VARCHAR(20) UNIQUE NOT NULL,
+                phonenumber VARCHAR(20) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL,
                 email VARCHAR(100) UNIQUE NOT NULL,
                 role VARCHAR(50) NOT NULL,
                 position VARCHAR(50)
             )
         """)
-        
-        # Create AttendanceRegister Table
+
+        # Create AttendanceRegister
         cur.execute("""
-            CREATE TABLE IF NOT EXISTS AttendanceRegister (
+            CREATE TABLE IF NOT EXISTS attendanceregister (
                 id BIGSERIAL PRIMARY KEY,
-                employee_id BIGINT NOT NULL,
-                clockIn TIMESTAMP,
-                clockOut TIMESTAMP,
-                notes TEXT,
-                CONSTRAINT fk_employee
-                    FOREIGN KEY (employee_id) REFERENCES MaxeloClientTable(id)
-                    ON DELETE CASCADE
+                employee_id BIGINT NOT NULL REFERENCES maxeloclienttable(id) ON DELETE CASCADE,
+                clockin TIMESTAMP,
+                clockout TIMESTAMP,
+                notes TEXT
             )
         """)
-        
-        # Check if admin user exists, create if not
-        cur.execute("SELECT * FROM MaxeloClientTable WHERE email = 'admin@maxelo.com'")
+
+        # Insert default admin if not exists
+        cur.execute("SELECT id FROM maxeloclienttable WHERE email = 'admin@maxelo.com'")
         if not cur.fetchone():
             cur.execute("""
-                INSERT INTO MaxeloClientTable (names, surname, phoneNumber, password, email, role, position)
-                VALUES ('System', 'Admin', '0820000000', 'admin123', 'admin@maxelo.com', 'Admin', 'Manager')
+                INSERT INTO maxeloclienttable (names, surname, phonenumber, password, email, role, position)
+                VALUES ('System', 'Admin', '0820000000', 'admin123', 'admin@maxelo.com', 'admin', 'Manager')
             """)
-        
+
         conn.commit()
         cur.close()
         conn.close()
-        print("Database tables initialized successfully")
-        
+        print("Database initialized successfully.")
+
     except Exception as e:
         print(f"Error initializing database: {e}")
 
-# --- Database connection ---
-def get_db_connection():
-    DATABASE_URL = os.getenv("DATABASE_URL")
-    if not DATABASE_URL:
-        DATABASE_URL = "postgresql://postgres:Maxelov%402023@localhost:5432/maxelo_attendance_db"
-    return psycopg2.connect(DATABASE_URL)
-
-# Initialize the database when the app starts
+# Initialize DB on app start
 init_db()
 
-# --- Index page ---
+# --- Index ---
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 # --- Login ---
 @app.route('/login', methods=['GET', 'POST'])
@@ -101,105 +83,45 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        user_type = request.form['user_type']  # radio button choice
+        user_type = request.form['user_type']
 
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("""
-            SELECT id, names, surname, email, role 
-            FROM MaxeloClientTable 
-            WHERE email=%s AND password=%s
-        """, (email, password))
-        user = cur.fetchone()
-        cur.close()
-        conn.close()
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT id, names, surname, email, role
+                FROM maxeloclienttable
+                WHERE email=%s AND password=%s
+            """, (email, password))
+            user = cur.fetchone()
+            cur.close()
+            conn.close()
 
-        if user:
-            session['user_id'] = user[0]
-            session['user_name'] = user[1]
-            session['user_surname'] = user[2]
-            session['email'] = user[3]
-            session['role'] = user[4].lower()
+            if user:
+                session['user_id'] = user[0]
+                session['user_name'] = user[1]
+                session['user_surname'] = user[2]
+                session['email'] = user[3]
+                session['role'] = user[4].lower()
 
-            flash("Login successful!", "success")
+                flash("Login successful!", "success")
 
-            # --- Redirect rules ---
-            if user_type == "admin" and session['role'] == "admin":
-                return redirect(url_for('admin_dashboard'))
-            elif user_type == "employee" and session['role'] == "employee":
-                return redirect(url_for('employee_dashboard'))
-            elif user_type == "employee" and session['role'] == "intern":
-                return redirect(url_for('employee_dashboard'))
-            elif user_type == "employee" and session['role'] == "admin":
-                # Admin logging in as employee
-                return redirect(url_for('employee_dashboard'))
+                if user_type == "admin" and session['role'] == "admin":
+                    return redirect(url_for('admin_dashboard'))
+                elif user_type == "employee" and session['role'] in ["employee", "intern", "admin"]:
+                    return redirect(url_for('employee_dashboard'))
+                else:
+                    flash("Role mismatch: wrong login option.", "error")
+                    return redirect(url_for('login'))
             else:
-                flash("Role mismatch: you selected the wrong login option.", "error")
+                flash("Invalid email or password", "error")
                 return redirect(url_for('login'))
-        else:
-            flash("Invalid email or password", "error")
+
+        except Exception as e:
+            flash(f"Database error: {str(e)}", "error")
             return redirect(url_for('login'))
 
     return render_template('login.html')
-
-
-# --- Reset Password ---
-@app.route('/reset_password', methods=['GET', 'POST'])
-def reset_password():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        user_id = request.form.get('user_id')
-
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("SELECT id FROM MaxeloClientTable WHERE id = %s AND email = %s", (user_id, email))
-        user = cur.fetchone()
-
-        if user:
-            # redirect to reset page form
-            cur.close()
-            conn.close()
-            session['reset_user_id'] = user_id
-            return redirect(url_for('reset_password_form'))
-        else:
-            flash("User ID and Email do not match.", "error")
-            cur.close()
-            conn.close()
-            return redirect(url_for('reset_password'))
-
-    return render_template('reset_password.html')
-
-
-# --- Reset Password Form ---
-@app.route('/reset_password_form', methods=['GET', 'POST'])
-def reset_password_form():
-    if 'reset_user_id' not in session:
-        flash("Please verify your account first.", "error")
-        return redirect(url_for('reset_password'))
-
-    if request.method == 'POST':
-        new_password = request.form.get('new_password')
-        user_id = session['reset_user_id']
-
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("UPDATE MaxeloClientTable SET password = %s WHERE id = %s", (new_password, user_id))
-        conn.commit()
-        cur.close()
-        conn.close()
-
-        session.pop('reset_user_id', None)
-        flash("Password reset successful!", "success")
-        return redirect(url_for('reset_password_successful'))
-
-    return render_template('reset_password_form.html')
-
-
-# --- Reset Password Successful ---
-@app.route('/reset_password_successful')
-def reset_password_successful():
-    return render_template('reset_password_successful.html')
-
 
 # --- Admin Dashboard ---
 @app.route('/dashboard/admin')
@@ -208,237 +130,135 @@ def admin_dashboard():
         flash("Unauthorized access.", "error")
         return redirect(url_for('login'))
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-
-    # Total employees (employee, inter, admin)
-    cur.execute("""
-        SELECT COUNT(*) 
-        FROM MaxeloClientTable 
-        WHERE role IN ('employee', 'intern', 'admin')
-    """)
-    employee_count = cur.fetchone()[0]
-
-    # Get today's date
-    today = datetime.now().date()
-
-    # Count present employees today
-    cur.execute("""
-        SELECT COUNT(*) 
-        FROM attendanceregister a
-        JOIN MaxeloClientTable e ON a.employee_id = e.id
-        WHERE DATE(a.clockin) = %s AND e.role IN ('employee', 'intern', 'admin')
-    """, (today,))
-    present_count = cur.fetchone()[0]
-
-    cur.close()
-    conn.close()
-
-    return render_template(
-        "admin_dashboard.html",
-        employee_count=employee_count,
-        present_today=present_count,
-        absent_today=employee_count - present_count,
-        current_user={
-            "id": session['user_id'],
-            "full_name": f"{session['user_name']} {session['user_surname']}",
-            "email": session['email'],
-            "last_login": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-    )
-
-# --- Add Employee ---
-@app.route('/add_employee', methods=['GET', 'POST'])
-def add_employee():
-    # Check if admin is logged in
-    if 'user_id' not in session or session.get('role') != 'admin':
-        flash('Please log in as admin to access this page.', 'error')
-        return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        # Get form data
-        names = request.form.get('names', '').strip()
-        surname = request.form.get('surname', '').strip()
-        phone = request.form.get('phoneNumber', '').strip()
-        email = request.form.get('email', '').strip()
-        password = request.form.get('password', '').strip()
-        role = request.form.get('role', '').strip()
-        position = request.form.get('position', '').strip()
-
-        if not all([names, surname, email, password, role]):
-            flash('Please fill in all required fields.', 'error')
-            return render_template('add_employee.html', 
-                                  names=names, surname=surname, phone=phone,
-                                  email=email, role=role, position=position)
-
+    try:
         conn = get_db_connection()
         cur = conn.cursor()
-        try:
-            # Check if email already exists
-            cur.execute("SELECT id FROM MaxeloClientTable WHERE email = %s", (email,))
-            if cur.fetchone():
-                flash('This email is already registered. Please use a different email.', 'error')
-                return render_template('add_employee.html', 
-                                      names=names, surname=surname, phone=phone,
-                                      email=email, role=role, position=position)
-            
-            # Check if phone number already exists
-            cur.execute("SELECT id FROM MaxeloClientTable WHERE phoneNumber = %s", (phone,))
-            if cur.fetchone():
-                flash('This phone number is already registered. Please use a different phone number.', 'error')
-                return render_template('add_employee.html', 
-                                      names=names, surname=surname, phone=phone,
-                                      email=email, role=role, position=position)
-            
-            # Insert employee
-            cur.execute(
-                """
-                INSERT INTO MaxeloClientTable
-                (names, surname, phoneNumber, email, password, role, position)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """,
-                (names, surname, phone, email, password, role, position)
-            )
-            conn.commit()
-            flash('Employee added successfully!', 'success')
-            return redirect(url_for('added_employee_successful'))
-            
-        except psycopg2.IntegrityError as e:
-            conn.rollback()
-            if 'email' in str(e).lower():
-                flash('This email is already registered. Please use a different email.', 'error')
-            elif 'phonenumber' in str(e).lower():
-                flash('This phone number is already registered. Please use a different phone number.', 'error')
-            else:
-                flash('Database integrity error occurred. Please check your input.', 'error')
-            return render_template('add_employee.html', 
-                                  names=names, surname=surname, phone=phone,
-                                  email=email, role=role, position=position)
-            
-        except Exception as e:
-            conn.rollback()
-            flash(f'Database error occurred: {str(e)}. Please try again.', 'error')
-            print(f"Database error: {e}")
-            return render_template('add_employee.html', 
-                                  names=names, surname=surname, phone=phone,
-                                  email=email, role=role, position=position)
-        finally:
-            cur.close()
-            conn.close()
 
-    # GET request renders the add employee form
-    return render_template('add_employee.html')
+        # Total employees
+        cur.execute("""
+            SELECT COUNT(*) FROM maxeloclienttable WHERE role IN ('employee', 'intern', 'admin')
+        """)
+        employee_count = cur.fetchone()[0]
 
+        # Present today
+        today = datetime.now().date()
+        cur.execute("""
+            SELECT COUNT(*) FROM attendanceregister a
+            JOIN maxeloclienttable e ON a.employee_id = e.id
+            WHERE DATE(a.clockin) = %s AND e.role IN ('employee', 'intern', 'admin')
+        """, (today,))
+        present_count = cur.fetchone()[0]
 
-# --- Success Page ---
-@app.route('/added-employee-successful')
-def added_employee_successful():
-    # Check if admin is logged in
-    if 'user_id' not in session or session.get('role') != 'admin':
-        flash('Please log in as admin to access this page.', 'error')
+        cur.close()
+        conn.close()
+
+        return render_template(
+            "admin_dashboard.html",
+            employee_count=employee_count,
+            present_today=present_count,
+            absent_today=employee_count - present_count,
+            current_user={
+                "id": session['user_id'],
+                "full_name": f"{session['user_name']} {session['user_surname']}",
+                "email": session['email'],
+                "last_login": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+        )
+    except Exception as e:
+        flash(f"Database error: {str(e)}", "error")
         return redirect(url_for('login'))
-
-    return render_template('added_employee_successful.html')
-
 
 # --- Employee Dashboard ---
 @app.route("/dashboard/employee")
 def employee_dashboard():
-    if "user_id" not in session:
-        return redirect(url_for("login"))
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
 
-    user_id = session["user_id"]
+    try:
+        user_id = session['user_id']
+        conn = get_db_connection()
+        cur = conn.cursor()
 
-    conn = get_db_connection()
-    cur = conn.cursor()
+        # User info
+        cur.execute("""
+            SELECT names, surname, email, phonenumber, role, position
+            FROM maxeloclienttable
+            WHERE id=%s
+        """, (user_id,))
+        user = cur.fetchone()
 
-    # Fetch user info
-    cur.execute("""
-        SELECT names, surname, email, phoneNumber, role, position
-        FROM maxeloclienttable
-        WHERE id=%s
-    """, (user_id,))
-    user = cur.fetchone()
+        # Today's attendance
+        cur.execute("""
+            SELECT clockin, clockout, notes
+            FROM attendanceregister
+            WHERE employee_id=%s AND DATE(clockin) = CURRENT_DATE
+            ORDER BY clockin DESC LIMIT 1
+        """, (user_id,))
+        today_attendance = cur.fetchone()
 
-    # Fetch today's attendance
-    cur.execute("""
-        SELECT clockin, clockout, notes
-        FROM attendanceregister
-        WHERE employee_id=%s AND DATE(clockin) = CURRENT_DATE
-        ORDER BY clockin DESC LIMIT 1
-    """, (user_id,))
-    today_attendance = cur.fetchone()
+        # Current month attendance
+        cur.execute("""
+            SELECT DATE(clockin), clockin, clockout, notes
+            FROM attendanceregister
+            WHERE employee_id=%s AND DATE_TRUNC('month', clockin) = DATE_TRUNC('month', CURRENT_DATE)
+            ORDER BY clockin DESC
+        """, (user_id,))
+        attendance_records = cur.fetchall()
 
-    # Fetch current month records
-    cur.execute("""
-        SELECT DATE(clockin) AS work_date,
-               clockin, clockout, notes
-        FROM attendanceregister
-        WHERE employee_id=%s 
-          AND DATE_TRUNC('month', clockin) = DATE_TRUNC('month', CURRENT_DATE)
-        ORDER BY clockin DESC
-    """, (user_id,))
-    attendance_records = cur.fetchall()
+        cur.close()
+        conn.close()
 
-    conn.close()
+        return render_template(
+            "employee_dashboard.html",
+            user={
+                "name": user[0],
+                "surname": user[1],
+                "email": user[2],
+                "phoneNumber": user[3],
+                "role": user[4],
+                "position": user[5],
+            },
+            today=date.today(),
+            clock_in_time=today_attendance[0] if today_attendance else None,
+            clock_out_time=today_attendance[1] if today_attendance else None,
+            attendance_type=today_attendance[2] if today_attendance else None,
+            attendance_records=[
+                {"date": rec[0], "clock_in": rec[1], "clock_out": rec[2], "notes": rec[3]}
+                for rec in attendance_records
+            ],
+            month_name=date.today().strftime("%B")
+        )
 
-    return render_template(
-        "employee_dashboard.html",
-        user={
-            "name": user[0],
-            "surname": user[1],
-            "email": user[2],
-            "phoneNumber": user[3],
-            "role": user[4],
-            "position": user[5],
-        },
-        today=date.today(),
-        clock_in_time=today_attendance[0] if today_attendance else None,
-        clock_out_time=today_attendance[1] if today_attendance else None,
-        attendance_type=today_attendance[2] if today_attendance else None,  # ✅ FIXED
-        attendance_records=[
-            {
-                "date": rec[0],
-                "clock_in": rec[1],
-                "clock_out": rec[2],
-                "notes": rec[3]
-            } for rec in attendance_records
-        ],
-        month_name=date.today().strftime("%B")
-    )
+    except Exception as e:
+        flash(f"Database error: {str(e)}", "error")
+        return redirect(url_for('login'))
 
-
-
-#--- Clock In ---
+# --- Clock In ---
 @app.route('/clock_in', methods=['POST'])
 def clock_in():
     if 'user_id' not in session:
         flash("Please log in first", "warning")
         return redirect(url_for('login'))
 
-    attendance_type = request.form.get("attendanceType") or ""
-    note_text = request.form.get("notes") or ""
-
-    # Save both in one column (attendance_type + notes)
+    attendance_type = request.form.get("attendanceType", "")
+    note_text = request.form.get("notes", "")
     combined_notes = f"({attendance_type}) {note_text}".strip()
+    sa_time = datetime.now(pytz.timezone("Africa/Johannesburg"))
 
-    sa_timezone = pytz.timezone("Africa/Johannesburg")
-    sa_time = datetime.now(sa_timezone)
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO attendanceregister (employee_id, clockin, notes)
+            VALUES (%s, %s, %s)
+        """, (session['user_id'], sa_time, combined_notes))
+        conn.commit()
+        cur.close()
+        conn.close()
+        flash("Clocked in successfully!", "success")
+    except Exception as e:
+        flash(f"Database error: {str(e)}", "error")
 
-    # Format date and time separately (no seconds)
-    date_str = sa_time.strftime("%Y-%m-%d %H:%M")
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        INSERT INTO AttendanceRegister (employee_id, clockIn, notes)
-        VALUES (%s, %s, %s)
-    """, (session['user_id'], date_str, combined_notes))
-    conn.commit()
-    cur.close()
-    conn.close()
-
-    flash("Clocked in successfully!", "success")
     return redirect(url_for('employee_dashboard'))
 
 # --- Clock Out ---
@@ -448,88 +268,30 @@ def clock_out():
         flash("Please log in first", "warning")
         return redirect(url_for('login'))
 
-    sa_timezone = pytz.timezone("Africa/Johannesburg")
-    sa_time = datetime.now(sa_timezone)
+    sa_time = datetime.now(pytz.timezone("Africa/Johannesburg"))
 
-     # Format date and time separately (no seconds)
-    date_str = sa_time.strftime("%Y-%m-%d %H:%M")
-
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT id FROM AttendanceRegister
-        WHERE employee_id = %s AND clockOut IS NULL
-        ORDER BY clockIn DESC LIMIT 1
-    """, (session['user_id'],))
-    row = cur.fetchone()
-
-    if row:
-        attendance_id = row[0]
-        cur.execute("UPDATE AttendanceRegister SET clockOut = %s WHERE id = %s", (date_str, attendance_id))
-        conn.commit()
-        flash("Clocked out successfully!", "success")
-    else:
-        flash("No active clock-in found for today.", "warning")
-
-    cur.close()
-    conn.close()
-    return redirect(url_for('employee_dashboard'))
-    # Get South African time
-    sa_timezone = pytz.timezone("Africa/Johannesburg")
-    sa_time = datetime.now(sa_timezone)
-
-
-    # Format date and time separately (no seconds)
-    date_str = sa_time.strftime("%Y-%m-%d")
-    time_str = sa_time.strftime("%H:%M")
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-
-    # Get latest clocked-in record without clockOut
-    cur.execute("""
-        SELECT id FROM AttendanceRegister
-        WHERE employee_id = %s AND clockOutTime IS NULL
-        ORDER BY clockInDate DESC, clockInTime DESC LIMIT 1
-    """, (session['user_id'],))
-    row = cur.fetchone()
-
-    if row:
-        attendance_id = row[0]
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
         cur.execute("""
-            UPDATE AttendanceRegister
-            SET clockOutDate = %s, clockOutTime = %s
-            WHERE id = %s
-        """, (date_str, time_str, attendance_id))
-        conn.commit()
-        flash("Clocked out successfully!", "success")
-    else:
-        flash("No active clock-in found for today.", "warning")
+            SELECT id FROM attendanceregister
+            WHERE employee_id=%s AND clockout IS NULL
+            ORDER BY clockin DESC LIMIT 1
+        """, (session['user_id'],))
+        row = cur.fetchone()
+        if row:
+            attendance_id = row[0]
+            cur.execute("UPDATE attendanceregister SET clockout=%s WHERE id=%s", (sa_time, attendance_id))
+            conn.commit()
+            flash("Clocked out successfully!", "success")
+        else:
+            flash("No active clock-in found for today.", "warning")
+        cur.close()
+        conn.close()
+    except Exception as e:
+        flash(f"Database error: {str(e)}", "error")
 
-    cur.close()
-    conn.close()
     return redirect(url_for('employee_dashboard'))
-
-
-# --- View Employees ---
-@app.route('/view_employees')
-def view_employees():
-    if 'user_id' not in session:
-        flash("Please log in first.", "error")
-        return redirect(url_for('login'))
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-    # Added phoneNumber to the SELECT query
-    cur.execute("SELECT id, names, surname, email, phoneNumber, role, position FROM MaxeloClientTable ORDER BY id ASC")
-    employees = cur.fetchall()
-    cur.close()
-    conn.close()
-
-    return render_template("view_employees.html", employees=employees)
-
 
 # --- Logout ---
 @app.route('/logout')
@@ -537,97 +299,6 @@ def logout():
     session.clear()
     flash("You have been logged out.", "info")
     return redirect(url_for('index'))
-
-
-# --- Employee Register Page ---
-@app.route('/register')
-def view_register():
-    if 'user_id' not in session:
-        flash("Please log in first.", "error")
-        return redirect(url_for('login'))
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-    # Fetch attendance and employee role
-    cur.execute("""
-        SELECT a.id, e.names, e.surname, e.role, a.clockIn, a.clockOut, a.notes
-        FROM AttendanceRegister a
-        JOIN MaxeloClientTable e ON a.employee_id = e.id
-        ORDER BY a.clockIn DESC
-    """)
-    attendance_records = cur.fetchall()
-    cur.close()
-    conn.close()
-
-    return render_template('view_employee_register.html', attendance_records=attendance_records)
-
-
-# --- Edit Employee ---
-@app.route('/edit_employee/<int:employee_id>', methods=['GET', 'POST'])
-def edit_employee(employee_id):
-    if 'user_id' not in session or session.get('role') != 'admin':
-        flash("Please log in as admin to access this page.", "error")
-        return redirect(url_for('login'))
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-    if request.method == 'POST':
-        names = request.form['names']
-        surname = request.form['surname']
-        phone = request.form['phoneNumber']
-        email = request.form['email']
-        role = request.form['role']
-        position = request.form.get('position', '')
-
-        cur.execute("""
-            UPDATE MaxeloClientTable
-            SET names=%s, surname=%s, phoneNumber=%s, email=%s, role=%s, position=%s
-            WHERE id=%s
-        """, (names, surname, phone, email, role, position, employee_id))
-        conn.commit()
-        cur.close()
-        conn.close()
-        flash("Employee updated successfully!", "success")
-        return redirect(url_for('view_employees'))
-
-    cur.execute("SELECT id, names, surname, email, phoneNumber, role, position FROM MaxeloClientTable WHERE id=%s", (employee_id,))
-    emp = cur.fetchone()
-    cur.close()
-    conn.close()
-    if not emp:
-        flash("Employee not found.", "error")
-        return redirect(url_for('view_employees'))
-
-    employee = {
-        "id": emp[0],
-        "names": emp[1],
-        "surname": emp[2],
-        "email": emp[3],
-        "phoneNumber": emp[4],
-        "role": emp[5],
-        "position": emp[6]
-    }
-
-    return render_template("edit_employee.html", employee=employee)
-
-
-# --- Delete Employee ---
-@app.route('/delete_employee/<int:employee_id>', methods=['GET'])
-def delete_employee(employee_id):
-    if 'user_id' not in session or session.get('role') != 'admin':
-        flash("Please log in as admin to access this page.", "error")
-        return redirect(url_for('login'))
-
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("DELETE FROM MaxeloClientTable WHERE id=%s", (employee_id,))
-    conn.commit()
-    cur.close()
-    conn.close()
-
-    flash("Employee deleted successfully!", "success")
-    return redirect(url_for('view_employees'))
-
 
 # --- Run App ---
 if __name__ == '__main__':
