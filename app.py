@@ -82,9 +82,21 @@ def init_db():
 # --- Database connection ---
 def get_db_connection():
     DATABASE_URL = os.getenv("DATABASE_URL")
+
+    # If running locally
     if not DATABASE_URL:
         DATABASE_URL = "postgresql://postgres:Maxelov%402023@localhost:5432/maxelo_attendance_db"
-    return psycopg2.connect(DATABASE_URL)
+
+    # Ensure compatibility between Render and psycopg2
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
+
+    try:
+        conn = psycopg2.connect(DATABASE_URL, sslmode="require" if "render.com" in DATABASE_URL else "disable")
+        return conn
+    except Exception as e:
+        print("❌ Database connection error:", e)
+        raise e
 
 # Initialize the database when the app starts
 init_db()
